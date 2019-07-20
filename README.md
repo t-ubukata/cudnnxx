@@ -1,1 +1,3 @@
 # cuxx
+
+CUDA C++ wrapper.

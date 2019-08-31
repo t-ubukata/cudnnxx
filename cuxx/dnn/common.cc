@@ -1,4 +1,4 @@
-#include "common.h"
+#include "cuxx/dnn/common.h"
 
 #include <iostream>
 

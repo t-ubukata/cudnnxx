@@ -1,8 +1,8 @@
 #ifndef CUXX_DNN_COMMON_H_
 #define CUXX_DNN_COMMON_H_
 
-namespace cuxx{
-namespace dnn{
+namespace cuxx {
+namespace dnn {
 
 int GetDeviceCount();
 

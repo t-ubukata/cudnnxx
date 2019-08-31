@@ -1,21 +1,23 @@
 CXX := clang++
 CUDA_DIR := /usr/local/cuda
-INCLUDE_DIR := $(CUDA_DIR)/include
-LIB_DIR := $(CUDA_DIR)/lib64
+# LIB_DIR := $(CUDA_DIR)/lib64
 # LIBLARIES := cudart cudnn
-CXXFLAGS := -g -std=c++11 -pedantic -Wall -Wextra -fno-exceptions -fPIC -I $(INCLUDE_DIR)
+CXXFLAGS := -g -std=c++11 -pedantic -Wall -Wextra -fno-exceptions -fPIC -I . \
+            -I $(CUDA_DIR)/include
 TARGET_LIB := ./lib/libcuxx.so
 BUILD_DIR := ./build
 OBJS := $(BUILD_DIR)/dnn.o
 LDFLAGS := -shared
 
 $(TARGET_LIB): $(OBJS)
-	$(LD) $(LDFLAGS) $^ -o $(TARGET_LIB)
+	$(CXX) $(LDFLAGS) $^ -o $(TARGET_LIB)
 
-SRC_DIR := ./src/cuxx
+SRC_DIR := ./cuxx
 
 $(BUILD_DIR)/dnn.o: $(SRC_DIR)/dnn/common.cc
 	$(CXX) $(CXXFLAGS) $^ -c -o $(BUILD_DIR)/dnn.o
+
+./test_bin/test_main: $(SRC_DIR)/test_main.cc $(SRC_DIR)/dnn/common_test.cc
 
 .PHONY: clean
 clean:

@@ -4,7 +4,7 @@
 namespace cuxx {
 namespace dnn {
 
-int TestGetDeviceCount();
+void TestGetDeviceCount();
 
 }  // namespace dnn
 }  // namespace cuxx

@@ -11,7 +11,6 @@ namespace dnn {
 int GetDeviceCount() {
   int device_count = 0;
   cudaGetDeviceCount(&device_count);
-  std::cerr << device_count << std::endl;
   return device_count;
 }
 

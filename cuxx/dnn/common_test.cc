@@ -1,16 +1,15 @@
-#include "cuxx/dnn/common_test.h"
-
 #include <iostream>
 
+#include "gtest/gtest.h"
 #include "cuxx/dnn/common.h"
 
 namespace cuxx {
 namespace dnn {
 
-void TestGetDeviceCount() {
+class CommonTest : public ::testing::Test {};
 
-  std::cerr << "Device count: " << dnn::GetDeviceCount() << std::endl;
-
+TEST_F(CommonTest, GetDeviceCount) {
+  std::cerr << "Device count: " << cuxx::dnn::GetDeviceCount() << std::endl;
 }
 
 }  // namespace dnn

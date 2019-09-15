@@ -1,14 +1,12 @@
 CXX := clang++
 CUDA_DIR := /usr/local/cuda
-# LIB_DIR := $(CUDA_DIR)/lib64
-# LIBLARIES := cudart cudnn
+GTEST_DIR := ./external/googletest/googletest
 CXXFLAGS := -g -std=c++11 -pedantic -Wall -Wextra -fno-exceptions -fPIC -I . \
-            -I $(CUDA_DIR)/include
+            -I $(CUDA_DIR)/include -I $(GTEST_DIR)/include
 TARGET_LIB := ./lib/libcuxx.so
-# BUILD_DIR := ./build
 OBJ_DIR := ./obj
-OBJS := $(OBJ_DIR)/common.o $(OBJ_DIR)/test_main.o $(OBJ_DIR)/common_test.o
-LDFLAGS := -L /usr/local/cuda/lib64 -l cuda -l cudart -l cudnn
+OBJS := $(OBJ_DIR)/common.o $(OBJ_DIR)/common_test.o
+LDFLAGS := -L $(CUDA_DIR)/lib64 -l pthread -l cuda -l cudart -l cudnn
 
 # The target lib.
 
@@ -17,24 +15,37 @@ $(TARGET_LIB): $(OBJS)
 
 SRC_DIR := ./cuxx
 
-# Objs.
+# Object files.
 
 $(OBJ_DIR)/common.o: $(SRC_DIR)/dnn/common.cc
 	$(CXX) $(CXXFLAGS) $^ -c -o $@
 
+.PHONY: test clean
+
+# Runs tets.
+
+TEST_BIN_DIR := ./test_bin
+
+test: $(TEST_BIN_DIR)/gtest_main
+	./test_bin/gtest_main
+
 # The test main.
 
-./test_bin/test_main: $(OBJ_DIR)/test_main.o $(TARGET_LIB)
+$(TEST_BIN_DIR)/gtest_main: $(OBJ_DIR)/common.o $(OBJ_DIR)/common_test.o \
+                       $(GTEST_DIR)/libgtest.a $(GTEST_DIR)/libgtest_main.a
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) $^ -o $@
 
-# Test objs.
+# Google Test.
+$(GTEST_DIR)/libgtest.a $(GTEST_DIR)/libgtest_main.a:
+	(cd $(GTEST_DIR) && CXX=$(CXX) cmake CMakeLists.txt && make)
 
-$(OBJ_DIR)/test_main.o: $(SRC_DIR)/test_main.cc $(TARGET_LIB)
-	$(CXX) $(CXXFLAGS) $^ -c -o $@
+# Test object files.
 
 $(OBJ_DIR)/common_test.o: $(SRC_DIR)/dnn/common_test.cc
 	$(CXX) $(CXXFLAGS) $^ -c -o $@
 
-.PHONY: clean
 clean:
-	$(RM) $(OBJ_DIR)/* $(TARGET_LIB)
+	$(RM) $(OBJ_DIR)/* $(TARGET_LIB) $(TEST_BIN_DIR)/* \
+	$(GTEST_DIR)/libgtest.a $(GTEST_DIR)/libgtest_main.a \
+	$(GTEST_DIR)/CMakeCache.txt $(GTEST_DIR)/cmake_install.cmake \
+	$(GTEST_DIR)/Makefile && $(RM) -r $(GTEST_DIR)/CMakeFiles

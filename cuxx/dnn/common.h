@@ -22,7 +22,7 @@ class Handle {
   Handle(const Handle&) = delete;
   Handle operator=(const Handle&) = delete;
 
-  cudnnHandle_t raw_handle() {return raw_handle_;}
+  cudnnHandle_t raw_handle() const {return raw_handle_;}
 
  private:
   cudnnHandle_t raw_handle_;
@@ -69,8 +69,8 @@ class Tensor {
     CUXX_DNN_CHECK(cudnnDestroyTensorDescriptor(desc_));
   }
 
-  cudnnTensorDescriptor_t desc() {return desc;}
-  T* dev_mem() {return dev_mem_;}
+  cudnnTensorDescriptor_t desc() const {return desc;}
+  T* dev_mem() const {return dev_mem_;}
 
  private:
   cudnnTensorDescriptor_t desc_;

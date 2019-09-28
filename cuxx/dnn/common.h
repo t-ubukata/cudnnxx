@@ -20,7 +20,7 @@ class Handle {
   }
 
   Handle(const Handle&) = delete;
-  Handle(const Handle&&) = delete;
+  Handle operator=(const Handle&) = delete;
 
   cudnnHandle_t raw_handle() {return raw_handle_;}
 
@@ -63,7 +63,7 @@ class Tensor {
   }
 
   Tensor(const Tensor&) = delete;
-  Tensor(const Tensor&&) = delete;
+  Tensor operator=(const Tensor&) = delete;
 
   ~Tensor() {
     CUXX_DNN_CHECK(cudnnDestroyTensorDescriptor(desc_));

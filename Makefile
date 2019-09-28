@@ -32,7 +32,7 @@ test: $(TEST_BIN_DIR)/gtest_main
 # The test main.
 
 $(TEST_BIN_DIR)/gtest_main: $(OBJ_DIR)/common.o $(OBJ_DIR)/common_test.o \
-                       $(GTEST_DIR)/libgtest.a $(GTEST_DIR)/libgtest_main.a
+                            $(GTEST_DIR)/libgtest.a $(GTEST_DIR)/libgtest_main.a
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) $^ -o $@
 
 # Google Test.

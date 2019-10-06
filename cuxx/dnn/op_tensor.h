@@ -33,14 +33,14 @@ class OpTensor {
   void Compute(const Handle& handle,
                FactorT alpha1, const Tensor<TensorT>& a,
                FactorT alpha2, const Tensor<TensorT>& b,
-               FactorT beta, const Tensor<TensorT>& c) {
+               FactorT beta, Tensor<TensorT>* c) {
     const auto alpha1_lvalue = alpha1;
     const auto alpha2_lvalue = alpha2;
     const auto beta_lvalue = beta;
     CUXX_DNN_CHECK(cudnnOpTensor(handle.raw_handle(), desc_,
                    &alpha1_lvalue, a.desc(), a.dev_mem(),
-                   &alpha2_lvalue, b.desc, b.dev_mem(),
-                   &beta_lvalue, c.desc(), c.dev_mem()));
+                   &alpha2_lvalue, b.desc(), b.dev_mem(),
+                   &beta_lvalue, c->desc(), c->dev_mem()));
   }
 
  private:

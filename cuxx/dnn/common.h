@@ -69,7 +69,7 @@ class Tensor {
     CUXX_DNN_CHECK(cudnnDestroyTensorDescriptor(desc_));
   }
 
-  cudnnTensorDescriptor_t desc() const {return desc;}
+  cudnnTensorDescriptor_t desc() const {return desc_;}
   T* dev_mem() const {return dev_mem_;}
 
  private:

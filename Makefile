@@ -5,7 +5,7 @@ CXXFLAGS := -g -std=c++11 -pedantic -Wall -Wextra -fno-exceptions -fPIC -I . \
             -I $(CUDA_DIR)/include -I $(GTEST_DIR)/googletest/include
 TARGET_LIB := ./lib/libcuxx.so
 OBJ_DIR := ./obj
-OBJS := $(OBJ_DIR)/common.o $(OBJ_DIR)/op_tensor.o
+OBJS := $(OBJ_DIR)/common.o $(OBJ_DIR)/op_tensor.o $(OBJ_DIR)/convolution.o
 LDFLAGS := -L $(CUDA_DIR)/lib64 -l pthread -l cuda -l cudart -l cudnn
 
 # The target lib.
@@ -22,6 +22,9 @@ $(OBJ_DIR)/common.o: $(SRC_DIR)/dnn/common.cc
 $(OBJ_DIR)/op_tensor.o: $(SRC_DIR)/dnn/op_tensor.cc
 	$(CXX) $(CXXFLAGS) $^ -c -o $@
 
+$(OBJ_DIR)/convolution.o: $(SRC_DIR)/dnn/convolution.cc
+	$(CXX) $(CXXFLAGS) $^ -c -o $@
+
 .PHONY: test clean
 
 TEST_BIN_DIR := ./test_bin
@@ -30,7 +33,8 @@ TEST_BIN_DIR := ./test_bin
 test: $(TEST_BIN_DIR)/gtest_main
 	./test_bin/gtest_main
 
-TEST_OBJS := $(OBJ_DIR)/common_test.o $(OBJ_DIR)/op_tensor_test.o
+TEST_OBJS := $(OBJ_DIR)/common_test.o $(OBJ_DIR)/op_tensor_test.o \
+             $(OBJ_DIR)/convolution_test.o
 
 # The test main.
 $(TEST_BIN_DIR)/gtest_main: $(OBJS) $(TEST_OBJS) \
@@ -48,6 +52,9 @@ $(OBJ_DIR)/common_test.o: $(SRC_DIR)/dnn/common_test.cc
 	$(CXX) $(CXXFLAGS) $^ -c -o $@
 
 $(OBJ_DIR)/op_tensor_test.o: $(SRC_DIR)/dnn/op_tensor_test.cc
+	$(CXX) $(CXXFLAGS) $^ -c -o $@
+
+$(OBJ_DIR)/convolution_test.o: $(SRC_DIR)/dnn/convolution_test.cc
 	$(CXX) $(CXXFLAGS) $^ -c -o $@
 
 clean:

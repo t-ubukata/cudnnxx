@@ -11,14 +11,14 @@ namespace dnn {
 
 // TODO(t-ubukata): Consider type constraints.
 
-// T must be float or double.
+// FactorT must be float or double.
 template<typename TensorT, typename FactorT>
 class OpTensor {
  public:
-  OpTensor(cudnnOpTensorOp_t op, cudnnDataType_t CompType,
-           cudnnNanPropagation_t NanOpt) {
+  OpTensor(cudnnOpTensorOp_t op, cudnnDataType_t dtype,
+           cudnnNanPropagation_t nan_opt) {
     CUXX_DNN_CHECK(cudnnCreateOpTensorDescriptor(&desc_));
-    CUXX_DNN_CHECK(cudnnSetOpTensorDescriptor(desc_, op, CompType, NanOpt));
+    CUXX_DNN_CHECK(cudnnSetOpTensorDescriptor(desc_, op, dtype, nan_opt));
   }
 
   ~OpTensor() {

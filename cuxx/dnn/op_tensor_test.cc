@@ -35,7 +35,7 @@ TEST_F(OpTensorTest, TestAdd) {
                             1.9, 2.0, 2.1, 2.2, 2.3, 2.4};
   float* a_dev;
   cudaMalloc(&a_dev, size);
-  cudaMemcpy(a_host, a_dev, size, cudaMemcpyHostToDevice);
+  cudaMemcpy(a_dev, a_host, size, cudaMemcpyHostToDevice);
   Tensor<float> a_tensor(CUDNN_DATA_FLOAT, CUDNN_TENSOR_NCHW, n, c, h, w,
                          a_dev);
 
@@ -45,14 +45,14 @@ TEST_F(OpTensorTest, TestAdd) {
                             1.9, 2.0, 2.1, 2.2, 2.3, 2.4};
   float* b_dev;
   cudaMalloc(&b_dev, size);
-  cudaMemcpy(b_host, b_dev, size, cudaMemcpyHostToDevice);
+  cudaMemcpy(b_dev, b_host, size, cudaMemcpyHostToDevice);
   Tensor<float> b_tensor(CUDNN_DATA_FLOAT, CUDNN_TENSOR_NCHW, n, c, h, w,
                          b_dev);
 
   float c_host[num_elem] = {};
   float* c_dev;
   cudaMalloc(&c_dev, size);
-  cudaMemcpy(c_host, c_dev, size, cudaMemcpyHostToDevice);
+  cudaMemcpy(c_dev, c_host, size, cudaMemcpyHostToDevice);
   Tensor<float> c_tensor(CUDNN_DATA_FLOAT, CUDNN_TENSOR_NCHW, n, c, h, w,
                          c_dev);
 
@@ -88,7 +88,7 @@ TEST_F(OpTensorTest, Temp) {
                             1.9, 2.0, 2.1, 2.2, 2.3, 2.4};
   float* a_dev;
   cudaMalloc(&a_dev, size);
-  cudaMemcpy(a_host, a_dev, size, cudaMemcpyHostToDevice);
+  cudaMemcpy(a_dev, a_host, size, cudaMemcpyHostToDevice);
   cudaDeviceSynchronize();
 
   cudnnTensorDescriptor_t a_desc;
@@ -102,7 +102,7 @@ TEST_F(OpTensorTest, Temp) {
                             1.9, 2.0, 2.1, 2.2, 2.3, 2.4};
   float* b_dev;
   cudaMalloc(&b_dev, size);
-  cudaMemcpy(b_host, b_dev, size, cudaMemcpyHostToDevice);
+  cudaMemcpy(b_dev, b_host, size, cudaMemcpyHostToDevice);
   cudaDeviceSynchronize();
 
   cudnnTensorDescriptor_t b_desc;
@@ -116,7 +116,7 @@ TEST_F(OpTensorTest, Temp) {
                             1.9, 2.0, 2.1, 2.2, 2.3, 2.4};
   float* c_dev;
   cudaMalloc(&c_dev, size);
-  cudaMemcpy(c_host, c_dev, size, cudaMemcpyHostToDevice);
+  cudaMemcpy(c_dev, c_host, size, cudaMemcpyHostToDevice);
   cudaDeviceSynchronize();
 
   cudnnTensorDescriptor_t c_desc;

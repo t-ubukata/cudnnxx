@@ -9,7 +9,7 @@
 namespace cuxx {
 namespace dnn {
 
-// TODO(t-ubukata): Consider to check types via type_traits.
+// TODO(t-ubukata): Consider type constraints.
 
 // T must be float or double.
 template<typename TensorT, typename FactorT>

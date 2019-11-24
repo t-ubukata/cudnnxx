@@ -14,5 +14,14 @@ TEST_F(ConvolutionTest, TestConstructor2d) {
                                  CUDNN_DATA_FLOAT);
 }
 
+TEST_F(ConvolutionTest, TestConstructorNd) {
+  constexpr int array_length = 3;
+  constexpr int pads[array_length] = {4, 4, 4};
+  constexpr int filter_strides[array_length] = {2, 2, 2};
+  constexpr int dilations[array_length] = {2, 2, 2};
+  Convolution<float, float> conv(array_length, pads, filter_strides, dilations,
+                                 CUDNN_CONVOLUTION, CUDNN_DATA_FLOAT);
+}
+
 }  // namespace dnn
 }  // namespace cuxx

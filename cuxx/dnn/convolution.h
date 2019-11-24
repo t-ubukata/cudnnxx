@@ -24,6 +24,14 @@ class Convolution {
   }
 
   // Nd
+  Convolution(int array_length, const int pads[], const int filter_strides[],
+              const int dilations[],
+              cudnnConvolutionMode_t mode, cudnnDataType_t dtype) {
+    CUXX_DNN_CHECK(cudnnCreateConvolutionDescriptor(&desc_));
+    CUXX_DNN_CHECK(cudnnSetConvolutionNdDescriptor(desc_, array_length, pads,
+                                                   filter_strides, dilations,
+                                                   mode, dtype));
+  }
 
   ~Convolution() {
     CUXX_DNN_CHECK(cudnnDestroyConvolutionDescriptor(desc_));

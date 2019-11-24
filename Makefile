@@ -1,12 +1,13 @@
 CXX := clang++
 CUDA_DIR := /usr/local/cuda
 GTEST_DIR := ./external/googletest
-CXXFLAGS := -g -std=c++11 -pedantic -Wall -Wextra -fno-exceptions -fPIC -I . \
-            -I $(CUDA_DIR)/include -I $(GTEST_DIR)/googletest/include
+CXXFLAGS := -g -std=c++11 -Wall -Wextra -Werror -pedantic -pedantic-errors \
+            -fno-exceptions -fPIC -I. \
+            -I$(CUDA_DIR)/include -I$(GTEST_DIR)/googletest/include
 TARGET_LIB := ./lib/libcuxx.so
 OBJ_DIR := ./obj
 OBJS := $(OBJ_DIR)/common.o $(OBJ_DIR)/op_tensor.o $(OBJ_DIR)/convolution.o
-LDFLAGS := -L $(CUDA_DIR)/lib64 -l pthread -l cuda -l cudart -l cudnn
+LDFLAGS := -L$(CUDA_DIR)/lib64 -lpthread -lcuda -lcudart -lcudnn
 
 # The target lib.
 $(TARGET_LIB): $(OBJS)

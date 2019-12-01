@@ -45,7 +45,7 @@ $(TEST_BIN_DIR)/gtest_main: $(OBJS) $(TEST_OBJS) \
 
 # Google Test.
 $(GTEST_DIR)/googletest/libgtest.a $(GTEST_DIR)/googletest/libgtest_main.a:
-	(cd $(GTEST_DIR)/googletest && CXX=$(CXX) cmake CMakeLists.txt && make)
+	(cd $(GTEST_DIR)/googletest && CC=clang CXX=$(CXX) cmake CMakeLists.txt && make)
 
 # Test object files.
 

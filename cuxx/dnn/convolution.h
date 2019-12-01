@@ -33,6 +33,21 @@ class Convolution {
                                                    mode, dtype));
   }
 
+  void SetGroupCount(int group_count) {
+    CUXX_DNN_CHECK(cudnnSetConvolutionGroupCount(desc_, group_count));
+  }
+
+  void SetMathType(cudnnMathType_t math_type) {
+    CUXX_DNN_CHECK(cudnnSetConvolutionMathType(desc_, math_type));
+  }
+
+  // GetForwardAlgorithmMaxCount
+  // GetForwardAlgorithm
+  // FindForwardAlgorithmEx
+  // GetForwardWorkspaceSize
+  // GetNdForwardOutputDim
+  // Forward
+
   ~Convolution() {
     CUXX_DNN_CHECK(cudnnDestroyConvolutionDescriptor(desc_));
   }
@@ -41,7 +56,6 @@ class Convolution {
   Convolution operator=(const Convolution&) = delete;
 
   cudnnConvolutionDescriptor_t desc() {return desc_;}
-
 
  private:
   cudnnConvolutionDescriptor_t desc_;

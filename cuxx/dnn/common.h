@@ -7,8 +7,6 @@
 namespace cuxx {
 namespace dnn {
 
-// TODO(t-ubukata): Consider about copy constructors and move constructors.
-
 class Handle {
  public:
   Handle() {
@@ -29,7 +27,6 @@ class Handle {
 };
 
 // The caller must allocate dev_mem previously.
-// TODO(t-ubukata): Consider about type constraints.
 template<typename T>
 class Tensor {
  public:

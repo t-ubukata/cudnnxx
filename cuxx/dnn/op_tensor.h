@@ -9,8 +9,6 @@
 namespace cuxx {
 namespace dnn {
 
-// TODO(t-ubukata): Consider type constraints.
-
 // FactorT must be float or double.
 template<typename TensorT, typename FactorT>
 class OpTensor {

@@ -31,3 +31,15 @@
 *.out
 *.app
 test_bin/*
+
+# GoogleTest files
+external/googlltest/.git
+external/googletest/googletest/libgtest.a
+external/googletest/googletest/libgtest_main.a
+external/googletest/googletest/CMakeCache.txt
+external/googletest/googletest/cmake_install.cmake
+external/googletest/googletest/Makefile
+external/googletest/CMakeCache.txt
+external/googletest/googlemock/libgmock.a
+external/googletest/googlemock/libgmock_main.a
+external/googletest//googletest/CMakeFiles/*

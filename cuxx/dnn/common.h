@@ -74,6 +74,40 @@ class Tensor {
   T* dev_mem_;
 };
 
+// The caller must allocate dev_mem previously.
+template<typename T>
+class Filter {
+ public:
+  Filter(cudnnDataType_t dtype, cudnnTensorFormat_t format,
+         int k, int c, int h, int w, T* dev_mem) : dev_mem_(dev_mem) {
+    CUXX_DNN_CHECK(cudnnCreateFilterDescriptor(&desc_));
+    CUXX_DNN_CHECK(cudnnSetFilter4dDescriptor(desc_, dtype, format,
+                                              k, c, h, w));
+  }
+
+  Filter(cudnnDataType_t dtype, cudnnTensorFormat_t format, int n_dims,
+        int dims[], T* dev_mem) : dev_mem_(dev_mem) {
+    CUXX_DNN_CHECK(cudnnCreateFilterDescriptor(&desc_));
+    CUXX_DNN_CHECK(cudnnSetFilterNdDescriptor(desc_, dtype, format, n_dims,
+                                              dims));
+  }
+
+  Filter(const Filter&) = delete;
+  Filter operator=(const Filter&) = delete;
+
+  ~Filter() {
+    CUXX_DNN_CHECK(cudnnDestroyFilterDescriptor(desc_));
+  }
+
+  cudnnFilterDescriptor_t desc() const {return desc_;}
+  T* dev_mem() const {return dev_mem_;}
+
+ private:
+  cudnnFilterDescriptor_t desc_;
+  T* dev_mem_;
+};
+
+
 }  // namespace dnn
 }  // namespace cuxx
 

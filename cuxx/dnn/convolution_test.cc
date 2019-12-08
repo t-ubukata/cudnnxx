@@ -52,9 +52,24 @@ TEST_F(ConvolutionTest, TestGetForwardAlgorithmMaxCount) {
 // TEST_F(ConvolutionTest, TestGetForwardAlgorithm) {
 //   Convolution<float, float> conv(4, 4, 2, 2, 2, 2, CUDNN_CONVOLUTION,
 //                                  CUDNN_DATA_FLOAT);
-//   // const cudnnTensorDescriptor_t x_desc;
-//   // const cudnnFilterDescriptor_t w_desc;
-//   // const cudnnTensorDescriptor_t y_desc;
+//   constexpr int n = 2;
+//   constexpr int c = 3;
+//   constexpr int h = 2;
+//   constexpr int w = 2;
+//   constexpr int n_elem = n * c * h * w;
+//   float* mem_host[n_elem] = {};
+//   float* mem_dev = nullptr;
+//   size_t size = sizeof(float) * n_elem;
+//   cudaMalloc(&mem_dev, size);
+//   cudaMemcpy(mem_host, mem_dev, size, cudaMemcpyHostToDevice);
+//   Tensor<float> x(CUDNN_DATA_FLOAT, CUDNN_TENSOR_NCHW, n, c, h, w, mem_dev);
+//   cudaFree(mem_dev);
+//
+//
+//
+//   // const Filter w;
+//   // const Tensor y;
+//
 //   int requested_count = conv.GetForwardAlgorithmMaxCount(handle);
 //   int returned_count;
 //

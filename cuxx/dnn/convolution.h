@@ -60,20 +60,18 @@ class Convolution {
     return count;
   }
 
-  void GetForwardAlgorithm(const cuxx::dnn::Handle& handle,
-                           const cudnnTensorDescriptor_t x_desc,
-                           const cudnnFilterDescriptor_t w_desc,
-                           const cudnnTensorDescriptor_t y_desc,
-                           const int requested_algo_count,
-                           int *returned_algo_count,
-                           cudnnConvolutionFwdAlgoPerf_t *perf) {
-    CUXX_DNN_CHECK(cudnnGetConvolutionForwardAlgorithm_v7(handle.raw_handle(),
-                                                          x_desc, w_desc,
-                                                          desc_, y_desc,
-                                                          requested_algo_count,
-                                                          returned_algo_count,
-                                                          perf));
-  }
+  // void GetForwardAlgorithm(const Handle& handle, const Tensor& x,
+  //                          const Filter& w, const Tensor& y,
+  //                          const int requested_algo_count,
+  //                          int *returned_algo_count,
+  //                          cudnnConvolutionFwdAlgoPerf_t *perf) {
+  //   CUXX_DNN_CHECK(cudnnGetConvolutionForwardAlgorithm_v7(handle.raw_handle(),
+  //                                                         x.desc(), w.desc(),
+  //                                                         desc_, y.desc(),
+  //                                                         requested_algo_count,
+  //                                                         returned_algo_count,
+  //                                                         perf));
+  // }
 
   // FindForwardAlgorithmEx
   // GetForwardWorkspaceSize

@@ -94,34 +94,34 @@ TEST_F(TensorTest, TestConstructorNdEx) {
 class FilterTest : public ::testing::Test {};
 
 TEST_F(FilterTest, TestConstructor4d) {
-  constexpr int n = 2;
+  constexpr int k = 2;
   constexpr int c = 3;
   constexpr int h = 2;
   constexpr int w = 2;
-  constexpr int n_elem = n * c * h * w;
+  constexpr int n_elem = k * c * h * w;
   float* mem_host[n_elem] = {};
   float* mem_dev = nullptr;
   size_t size = sizeof(float) * n_elem;
   cudaMalloc(&mem_dev, size);
   cudaMemcpy(mem_host, mem_dev, size, cudaMemcpyHostToDevice);
-  Filter<float> f(CUDNN_DATA_FLOAT, CUDNN_TENSOR_NCHW, n, c, h, w, mem_dev);
+  Filter<float> f(CUDNN_DATA_FLOAT, CUDNN_TENSOR_NCHW, k, c, h, w, mem_dev);
   cudaFree(mem_dev);
 }
 
 TEST_F(FilterTest, TestConstructorNd) {
-  constexpr int n_dims = 3;
-  constexpr int n = 4;
-  constexpr int h = 2;
-  constexpr int w = 2;
-  constexpr int n_elem = n * h * w;
+  constexpr int k = 2;
+  constexpr int c = 3;
+  constexpr int r = 2;
+  constexpr int s = 2;
+  constexpr int n_elem = k * c * r * s;
   float* mem_host[n_elem] = {};
   float* mem_dev = nullptr;
   size_t size = sizeof(float) * n_elem;
   cudaMalloc(&mem_dev, size);
   cudaMemcpy(mem_host, mem_dev, sizeof(float) * n_elem,
              cudaMemcpyHostToDevice);
-  // HWN
-  int dims[n_dims] = {n, h, w};
+  constexpr int n_dims = 4;
+  int dims[n_dims] = {k, c, r, s};
   Filter<float> f(CUDNN_DATA_FLOAT, CUDNN_TENSOR_NCHW, n_dims, dims, mem_dev);
   cudaFree(mem_dev);
 }

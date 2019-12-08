@@ -30,33 +30,33 @@ class Handle {
 template<typename T>
 class Tensor {
  public:
-  Tensor(cudnnDataType_t dataType, cudnnTensorFormat_t format,
+  Tensor(cudnnDataType_t dtype, cudnnTensorFormat_t format,
          int n, int c, int h, int w, T* dev_mem) : dev_mem_(dev_mem) {
     CUXX_DNN_CHECK(cudnnCreateTensorDescriptor(&desc_));
-    CUXX_DNN_CHECK(cudnnSetTensor4dDescriptor(desc_, format, dataType,
+    CUXX_DNN_CHECK(cudnnSetTensor4dDescriptor(desc_, format, dtype,
                                               n, c, h, w));
   }
 
-  Tensor(cudnnDataType_t dataType, int n, int c, int h, int w,
-         int nStride, int cStride, int hStride, int wStride, T* dev_mem)
+  Tensor(cudnnDataType_t dtype, int n, int c, int h, int w,
+         int n_stride, int c_stride, int h_stride, int w_stride, T* dev_mem)
          : dev_mem_(dev_mem) {
     CUXX_DNN_CHECK(cudnnCreateTensorDescriptor(&desc_));
-    CUXX_DNN_CHECK(cudnnSetTensor4dDescriptorEx(desc_, dataType,
-                   n, c, h, w, nStride, cStride, hStride, wStride));
+    CUXX_DNN_CHECK(cudnnSetTensor4dDescriptorEx(desc_, dtype,
+                   n, c, h, w, n_stride, c_stride, h_stride, w_stride));
   }
 
-  Tensor(cudnnDataType_t dataType, int nbDims, int dimA[], int strideA[],
+  Tensor(cudnnDataType_t dtype, int n_dims, int dims[], int strides[],
          T* dev_mem) : dev_mem_(dev_mem) {
     CUXX_DNN_CHECK(cudnnCreateTensorDescriptor(&desc_));
-    CUXX_DNN_CHECK(cudnnSetTensorNdDescriptor(desc_, dataType, nbDims, dimA,
-                                              strideA));
+    CUXX_DNN_CHECK(cudnnSetTensorNdDescriptor(desc_, dtype, n_dims, dims,
+                                              strides));
   }
 
-  Tensor(cudnnTensorFormat_t format, cudnnDataType_t dataType, int nbDims,
-         int dimA[], T* dev_mem) : dev_mem_(dev_mem) {
+  Tensor(cudnnTensorFormat_t format, cudnnDataType_t dtype, int n_dims,
+         int dims[], T* dev_mem) : dev_mem_(dev_mem) {
     CUXX_DNN_CHECK(cudnnCreateTensorDescriptor(&desc_));
-    CUXX_DNN_CHECK(cudnnSetTensorNdDescriptorEx(desc_, format, dataType, nbDims,
-                                                dimA));
+    CUXX_DNN_CHECK(cudnnSetTensorNdDescriptorEx(desc_, format, dtype, n_dims,
+                                                dims));
   }
 
   Tensor(const Tensor&) = delete;

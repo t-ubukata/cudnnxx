@@ -1,3 +1,4 @@
+CC := clang
 CXX := clang++
 CUDA_DIR := /usr/local/cuda
 GTEST_DIR := ./external/googletest
@@ -37,15 +38,15 @@ test: $(TEST_BIN_DIR)/gtest_main
 TEST_OBJS := $(OBJ_DIR)/common_test.o $(OBJ_DIR)/op_tensor_test.o \
              $(OBJ_DIR)/convolution_test.o
 
-# The test main.
-$(TEST_BIN_DIR)/gtest_main: $(OBJS) $(TEST_OBJS) \
-                            $(GTEST_DIR)/googletest/libgtest.a \
-                            $(GTEST_DIR)/googletest/libgtest_main.a
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) $^ -o $@
-
 # Google Test.
-$(GTEST_DIR)/googletest/libgtest.a $(GTEST_DIR)/googletest/libgtest_main.a:
-	(cd $(GTEST_DIR)/googletest && CC=clang CXX=$(CXX) cmake CMakeLists.txt && make)
+GTEST_TARGET := $(GTEST_DIR)/googletest/libgtest_main.a
+
+$(GTEST_TARGET):
+	(cd $(GTEST_DIR)/googletest && CC=$(CC) CXX=$(CXX) cmake CMakeLists.txt && make)
+
+# The test main.
+$(TEST_BIN_DIR)/gtest_main: $(OBJS) $(TEST_OBJS) $(GTEST_TARGET)
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) $^ -o $@ $(GTEST_DIR)/googletest/libgtest.a
 
 # Test object files.
 

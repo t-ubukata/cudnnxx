@@ -94,10 +94,10 @@ TEST_F(TensorTest, TestConstructorNdEx) {
 class FilterTest : public ::testing::Test {};
 
 TEST_F(FilterTest, TestConstructor4d) {
-  constexpr int k = 2;
-  constexpr int c = 3;
-  constexpr int h = 2;
-  constexpr int w = 2;
+  constexpr int k = 1;  // the number of output feature maps.
+  constexpr int c = 3;  // the number of input feature maps.
+  constexpr int h = 5;  // The height of each filter.
+  constexpr int w = 5;  // The width of each filter.
   constexpr int n_elem = k * c * h * w;
   float* mem_host[n_elem] = {};
   float* mem_dev = nullptr;
@@ -109,10 +109,10 @@ TEST_F(FilterTest, TestConstructor4d) {
 }
 
 TEST_F(FilterTest, TestConstructorNd) {
-  constexpr int k = 2;
-  constexpr int c = 3;
-  constexpr int r = 2;
-  constexpr int s = 2;
+  constexpr int k = 1;  // the number of output feature maps.
+  constexpr int c = 3;  // the number of input feature maps.
+  constexpr int r = 5;  // The number of rows per filter.
+  constexpr int s = 5;  // The number of columns per filter.
   constexpr int n_elem = k * c * r * s;
   float* mem_host[n_elem] = {};
   float* mem_dev = nullptr;

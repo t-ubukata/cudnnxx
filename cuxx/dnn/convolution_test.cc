@@ -1,3 +1,5 @@
+#include <vector>
+
 #include "gtest/gtest.h"
 #include "cuxx/dnn/convolution.h"
 
@@ -49,34 +51,53 @@ TEST_F(ConvolutionTest, TestGetForwardAlgorithmMaxCount) {
 }
 
 // No value check.
-// TEST_F(ConvolutionTest, TestGetForwardAlgorithm) {
-//   Convolution<float, float> conv(4, 4, 2, 2, 2, 2, CUDNN_CONVOLUTION,
-//                                  CUDNN_DATA_FLOAT);
-//   constexpr int n = 2;
-//   constexpr int c = 3;
-//   constexpr int h = 2;
-//   constexpr int w = 2;
-//   constexpr int n_elem = n * c * h * w;
-//   float* mem_host[n_elem] = {};
-//   float* mem_dev = nullptr;
-//   size_t size = sizeof(float) * n_elem;
-//   cudaMalloc(&mem_dev, size);
-//   cudaMemcpy(mem_host, mem_dev, size, cudaMemcpyHostToDevice);
-//   Tensor<float> x(CUDNN_DATA_FLOAT, CUDNN_TENSOR_NCHW, n, c, h, w, mem_dev);
-//   cudaFree(mem_dev);
-//
-//
-//
-//   // const Filter w;
-//   // const Tensor y;
-//
-//   int requested_count = conv.GetForwardAlgorithmMaxCount(handle);
-//   int returned_count;
-//
-//
-//
-//   EXPECT_EQ(requested_count, returned_count) << "Count mismatch.";
-// }
+TEST_F(ConvolutionTest, TestGetForwardAlgorithm) {
+  Convolution<float, float> conv(4, 4, 2, 2, 2, 2, CUDNN_CONVOLUTION,
+                                 CUDNN_DATA_FLOAT);
+  constexpr int x_n = 2;
+  constexpr int x_c = 3;
+  constexpr int x_h = 32;
+  constexpr int x_w = 32;
+  constexpr int n_x_elem = x_n * x_c * x_h * x_w;
+  size_t x_size = sizeof(float) * n_x_elem;
+  float* x_host[n_x_elem] = {};
+  float* x_dev = nullptr;
+  cudaMalloc(&x_dev, x_size);
+  cudaMemcpy(x_host, x_dev, x_size, cudaMemcpyHostToDevice);
+  Tensor<float> x(CUDNN_DATA_FLOAT, CUDNN_TENSOR_NCHW, x_n, x_c, x_h, x_w, x_dev);
+
+  constexpr int w_k = 2;  // the number of output feature maps.
+  constexpr int w_c = 3;  // the number of input feature maps.
+  constexpr int w_h = 5;  // The height of each filter.
+  constexpr int w_w = 5;  // The width of each filter.
+  constexpr int n_w_elem = w_k * w_c * w_h * w_w;
+  size_t w_size = sizeof(float) * n_w_elem;
+  float* w_host[n_w_elem] = {};
+  float* w_dev = nullptr;
+  cudaMalloc(&w_dev, w_size);
+  cudaMemcpy(w_host, w_dev, w_size, cudaMemcpyHostToDevice);
+  const Filter<float> w(CUDNN_DATA_FLOAT, CUDNN_TENSOR_NCHW, w_k, w_c, w_h, w_w, w_dev);
+
+  constexpr int y_n = 2;
+  constexpr int y_c = 1;
+  constexpr int y_h = 28;
+  constexpr int y_w = 28;
+  constexpr int n_y_elem = y_n * y_c * y_h * y_w;
+  size_t y_size = sizeof(float) * n_y_elem;
+  float* y_host[n_y_elem] = {};
+  float* y_dev = nullptr;
+  cudaMalloc(&y_dev, y_size);
+  cudaMemcpy(y_host, y_dev, y_size, cudaMemcpyHostToDevice);
+  Tensor<float> y(CUDNN_DATA_FLOAT, CUDNN_TENSOR_NCHW, y_n, y_c, y_h, y_w, y_dev);
+
+  int requested_count = conv.GetForwardAlgorithmMaxCount(handle);
+  int returned_count = 0;
+  std::vector<cudnnConvolutionFwdAlgoPerf_t> results_vec(requested_count);
+  conv.GetForwardAlgorithm(handle, x, w, y, requested_count, &returned_count,
+                           results_vec.data());
+  cudaFree(x_dev);
+  EXPECT_EQ(requested_count, returned_count) << "Count does not match.";
+}
 
 }  // namespace dnn
 }  // namespace cuxx

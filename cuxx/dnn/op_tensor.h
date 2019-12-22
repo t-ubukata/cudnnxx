@@ -26,12 +26,12 @@ class OpTensor {
   OpTensor(const OpTensor&) = delete;
   OpTensor operator=(const OpTensor&) = delete;
 
-  cudnnOpTensorDescriptor_t desc() {return desc_;}
+  cudnnOpTensorDescriptor_t desc() const {return desc_;}
 
   void Compute(const Handle& handle,
                FactorT alpha1, const Tensor<TensorT>& a,
                FactorT alpha2, const Tensor<TensorT>& b,
-               FactorT beta, Tensor<TensorT>* c) {
+               FactorT beta, Tensor<TensorT>* c) const {
     const auto alpha1_lvalue = alpha1;
     const auto alpha2_lvalue = alpha2;
     const auto beta_lvalue = beta;

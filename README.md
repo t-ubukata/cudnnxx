@@ -9,7 +9,7 @@ cuDNN C++ wrapper.
 - CUDA Toolkit 9.1 or later.
 - cuDNN 7.1 or later.
 
-## Instalation
+## Build
 
 ```
 make

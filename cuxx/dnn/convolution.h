@@ -74,11 +74,21 @@ class Convolution {
                                                           results));
   }
 
-  // GetForwardWorkspaceSize
+  size_t GetForwardWorkspaceSize(const Handle& handle, const Tensor<TensorT>& x,
+                                 const Filter<TensorT>& w,
+                                 const Tensor<TensorT>& y,
+                                 cudnnConvolutionFwdAlgo_t algo) const {
+    size_t size = 0;
+    CUXX_DNN_CHECK(cudnnGetConvolutionForwardWorkspaceSize(handle.raw_handle(),
+                                                           x.desc(), w.desc(),
+                                                           desc_, y.desc(),
+                                                           algo, &size));
+    return size;
+  }
 
   // TODO: workspace is from GetForwardWorkSpaceSize
   void FindForwardAlgorithm(const Handle& handle, const Tensor<TensorT>& x,
-                            const Filter<TensorT> w, const Tensor<TensorT>& y,
+                            const Filter<TensorT>& w, const Tensor<TensorT>& y,
                             const int requested_algo_count,
                             int *returned_algo_count,
                             cudnnConvolutionFwdAlgoPerf_t *results,

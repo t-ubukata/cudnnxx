@@ -19,6 +19,15 @@
     abort(); \
   } while (false)
 
+#define CUXX_CUDA_CHECK(EXPR) \
+  do { \
+    const auto error = (EXPR); \
+    if (error != cudaSuccess) { \
+      CUXX_LOG_FATAL(std::string(cudaGetErrorName(error)) + ": " \
+                     + std::string(cudaGetErrorString(error))); \
+    } \
+  } while (false)
+
 #define CUXX_DNN_CHECK(EXPR) \
   do { \
     const auto stat = (EXPR); \

@@ -52,17 +52,17 @@ TEST_F(ConvolutionTest, TestGetForwardAlgorithmMaxCount) {
 
 // No value check.
 TEST_F(ConvolutionTest, TestGetForwardAlgorithm) {
-  Convolution<float, float> conv(4, 4, 2, 2, 2, 2, CUDNN_CONVOLUTION,
+  Convolution<float, float> conv(0, 0, 1, 2, 1, 1, CUDNN_CONVOLUTION,
                                  CUDNN_DATA_FLOAT);
-  constexpr int x_n = 2;
+  constexpr int x_n = 32;
   constexpr int x_c = 3;
-  constexpr int x_h = 32;
-  constexpr int x_w = 32;
+  constexpr int x_h = 6;
+  constexpr int x_w = 4;
   constexpr int n_x_elem = x_n * x_c * x_h * x_w;
   size_t x_size = sizeof(float) * n_x_elem;
   float x_host[n_x_elem] = {};
   for (int i = 0; i < n_x_elem; ++i) {
-    x_host[i] = i * 0.1;
+    x_host[i] = i * 0.0001;
   }
   float* x_dev = nullptr;
   CUXX_CUDA_CHECK(cudaMalloc(&x_dev, x_size));
@@ -70,26 +70,26 @@ TEST_F(ConvolutionTest, TestGetForwardAlgorithm) {
   Tensor<float> x(CUDNN_DATA_FLOAT, CUDNN_TENSOR_NCHW, x_n, x_c, x_h, x_w,
                   x_dev);
 
-  constexpr int w_k = 2;  // The number of output feature maps.
+  constexpr int w_k = 4;  // The number of output feature maps.
   constexpr int w_c = 3;  // The number of input feature maps.
-  constexpr int w_h = 5;  // The height of each filter.
-  constexpr int w_w = 5;  // The width of each filter.
+  constexpr int w_h = 3;  // The height of each filter.
+  constexpr int w_w = 3;  // The width of each filter.
   constexpr int n_w_elem = w_k * w_c * w_h * w_w;
   size_t w_size = sizeof(float) * n_w_elem;
   float w_host[n_w_elem] = {};
   for (int i = 0; i < n_w_elem; ++i) {
-    x_host[i] = i * 0.01;
+    x_host[i] = i * 0.00001;
   }
   float* w_dev = nullptr;
   CUXX_CUDA_CHECK(cudaMalloc(&w_dev, w_size));
   CUXX_CUDA_CHECK(cudaMemcpy(w_dev, w_host, w_size, cudaMemcpyHostToDevice));
-  const Filter<float> w(CUDNN_DATA_FLOAT, CUDNN_TENSOR_NCHW, w_k, w_c, w_h, w_w,
+  Filter<float> w(CUDNN_DATA_FLOAT, CUDNN_TENSOR_NCHW, w_k, w_c, w_h, w_w,
                         w_dev);
 
-  constexpr int y_n = 2;
-  constexpr int y_c = 1;
-  constexpr int y_h = 28;
-  constexpr int y_w = 28;
+  constexpr int y_n = 32;
+  constexpr int y_c = 4;
+  constexpr int y_h = 4;
+  constexpr int y_w = 1;
   constexpr int n_y_elem = y_n * y_c * y_h * y_w;
   size_t y_size = sizeof(float) * n_y_elem;
   float y_host[n_y_elem] = {};
@@ -104,25 +104,20 @@ TEST_F(ConvolutionTest, TestGetForwardAlgorithm) {
   std::vector<cudnnConvolutionFwdAlgoPerf_t> results_vec(requested_count);
   conv.GetForwardAlgorithm(handle, x, w, y, requested_count, &returned_count,
                            results_vec.data());
-  // TODO: Fix CUDNN_STATUS_BAD_PARAM
-  for (auto&& r : results_vec) {
-    std::cerr << r.algo << std::endl;
-    std::cerr << cudnnGetErrorString(r.status) << std::endl;
-  }
+
   CUXX_CUDA_CHECK(cudaFree(y_dev));
   CUXX_CUDA_CHECK(cudaFree(w_dev));
   CUXX_CUDA_CHECK(cudaFree(x_dev));
   EXPECT_EQ(requested_count, returned_count) << "Count does not match.";
 }
 
-// TODO: Fix CUDNN_STATUS_BAD_PARAM
 TEST_F(ConvolutionTest, TestGetForwardWorkspaceSize) {
-  Convolution<float, float> conv(4, 4, 2, 2, 2, 2, CUDNN_CONVOLUTION,
+  Convolution<float, float> conv(0, 0, 1, 2, 1, 1, CUDNN_CONVOLUTION,
                                  CUDNN_DATA_FLOAT);
-  constexpr int x_n = 2;
+  constexpr int x_n = 32;
   constexpr int x_c = 3;
-  constexpr int x_h = 32;
-  constexpr int x_w = 32;
+  constexpr int x_h = 6;
+  constexpr int x_w = 4;
   constexpr int n_x_elem = x_n * x_c * x_h * x_w;
   size_t x_size = sizeof(float) * n_x_elem;
   float x_host[n_x_elem] = {};
@@ -132,23 +127,23 @@ TEST_F(ConvolutionTest, TestGetForwardWorkspaceSize) {
   Tensor<float> x(CUDNN_DATA_FLOAT, CUDNN_TENSOR_NCHW, x_n, x_c, x_h, x_w,
                   x_dev);
 
-  constexpr int w_k = 2;  // The number of output feature maps.
+  constexpr int w_k = 4;  // The number of output feature maps.
   constexpr int w_c = 3;  // The number of input feature maps.
-  constexpr int w_h = 5;  // The height of each filter.
-  constexpr int w_w = 5;  // The width of each filter.
+  constexpr int w_h = 3;  // The height of each filter.
+  constexpr int w_w = 3;  // The width of each filter.
   constexpr int n_w_elem = w_k * w_c * w_h * w_w;
   size_t w_size = sizeof(float) * n_w_elem;
   float w_host[n_w_elem] = {};
   float* w_dev = nullptr;
   CUXX_CUDA_CHECK(cudaMalloc(&w_dev, w_size));
   CUXX_CUDA_CHECK(cudaMemcpy(w_dev, w_host, w_size, cudaMemcpyHostToDevice));
-  const Filter<float> w(CUDNN_DATA_FLOAT, CUDNN_TENSOR_NCHW, w_k, w_c, w_h, w_w,
+  Filter<float> w(CUDNN_DATA_FLOAT, CUDNN_TENSOR_NCHW, w_k, w_c, w_h, w_w,
                         w_dev);
 
-  constexpr int y_n = 2;
-  constexpr int y_c = 1;
-  constexpr int y_h = 28;
-  constexpr int y_w = 28;
+  constexpr int y_n = 32;
+  constexpr int y_c = 4;
+  constexpr int y_h = 4;
+  constexpr int y_w = 1;
   constexpr int n_y_elem = y_n * y_c * y_h * y_w;
   size_t y_size = sizeof(float) * n_y_elem;
   float y_host[n_y_elem] = {};
@@ -159,7 +154,7 @@ TEST_F(ConvolutionTest, TestGetForwardWorkspaceSize) {
                   y_dev);
 
   const size_t size = conv.GetForwardWorkspaceSize(handle, x, w, y,
-                              CUDNN_CONVOLUTION_FWD_ALGO_DIRECT);
+                              CUDNN_CONVOLUTION_FWD_ALGO_GEMM);
   CUXX_UNUSED_VAR(size);
   CUXX_CUDA_CHECK(cudaFree(y_dev));
   CUXX_CUDA_CHECK(cudaFree(w_dev));

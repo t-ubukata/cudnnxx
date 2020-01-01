@@ -10,7 +10,11 @@
 // rnn
 // softmax
 // divisive_normalization
+// CTCLoss
+// Algorithm
+// AlgorithmPerformance
+// SpatialTransformer
+// Mutex.
 // Consider about type constraints.
 // Consider about copy constructors and move constructors.
-// Mutex.
-// Mutation?
+// Considet about mutation.

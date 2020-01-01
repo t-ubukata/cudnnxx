@@ -105,8 +105,22 @@ class Convolution {
                                                           workspace_size_in_bytes));
   }
 
+  // Get2dForwardOutputDim
   // GetNdForwardOutputDim
   // Forward
+  // cudnnConvolutionBiasActivationForward
+
+  // cudnnConvolutionBackwardBias
+  // cudnnConvolutionBackwardData
+  // cudnnConvolutionBackwardFilter
+  // cudnnFindConvolutionBackwardDataAlgorithmEx
+  // cudnnFindConvolutionBackwardFilterAlgorithmEx
+  // cudnnGetConvolutionBackwardDataAlgorithmMaxCount
+  // cudnnGetConvolutionBackwardDataAlgorithm_v7
+  // cudnnGetConvolutionBackwardDataWorkspaceSize
+  // cudnnGetConvolutionBackwardFilterAlgorithmMaxCount
+  // cudnnGetConvolutionBackwardFilterAlgorithm_v7
+  // cudnnGetConvolutionBackwardFilterWorkspaceSize
 
   ~Convolution() {
     CUXX_DNN_CHECK(cudnnDestroyConvolutionDescriptor(desc_));

@@ -2,18 +2,20 @@
 #include "cuxx/dnn/op_tensor.h"
 
 // TODO(t-ubukata):
-// activation
-// batch_norm
-// dropout
-// pooling
-// reduce_tensor
-// rnn
-// softmax
-// divisive_normalization
-// CTCLoss
-// Algorithm
-// AlgorithmPerformance
-// SpatialTransformer
+// Op
+//   activation
+//   batch_norm
+//   dropout
+//   pooling
+//   reduce_tensor
+//   rnn
+//   softmax
+//   divisive_normalization
+//   CTCLoss
+//   Algorithm
+//   AlgorithmPerformance
+//   SpatialTransformer
+//
 // Mutex.
 // Consider about type constraints.
 // Consider about copy constructors and move constructors.

@@ -86,12 +86,11 @@ class Convolution {
     return size;
   }
 
-  // TODO: workspace is from GetForwardWorkSpaceSize
   void FindForwardAlgorithm(const Handle& handle, const Tensor<TensorT>& x,
                             const Filter<TensorT>& w, const Tensor<TensorT>& y,
                             const int requested_algo_count,
-                            int *returned_algo_count,
-                            cudnnConvolutionFwdAlgoPerf_t *results,
+                            int* returned_algo_count,
+                            cudnnConvolutionFwdAlgoPerf_t* results,
                             void* workspace,
                             size_t workspace_size_in_bytes) const {
     CUXX_DNN_CHECK(cudnnFindConvolutionForwardAlgorithmEx(handle.raw_handle(),
@@ -105,9 +104,34 @@ class Convolution {
                                                           workspace_size_in_bytes));
   }
 
-  // Get2dForwardOutputDim
-  // GetNdForwardOutputDim
-  // Forward
+  void Get2dForwardOutputDim(const Tensor<TensorT>& input,
+                             const Filter<TensorT>& filter,
+                             int* n, int* c, int* h, int* w) const {
+    CUXX_DNN_CHECK(cudnnGetConvolution2dForwardOutputDim(desc_, input.desc(),
+                                                         filter.desc(),
+                                                         n, c, h, w));
+  }
+
+  void GetNdForwardOutputDim(const Tensor<TensorT>& input,
+                             const Filter<TensorT>& filter,
+                             int n_dims, int output_dims[]) const {
+    CUXX_DNN_CHECK(cudnnGetConvolutionNdForwardOutputDim(desc_, input.desc(),
+                                                         filter.desc(), n_dims,
+                                                         output_dims));
+  }
+
+  void Forward(const Handle& handle, FactorT alpha, const Tensor<TensorT>& x,
+               const Filter<TensorT>& w, cudnnConvolutionFwdAlgo_t algo,
+               void* workspace, size_t workspace_size,
+               FactorT beta, Tensor<TensorT>* y) const {
+    CUXX_DNN_CHECK(cudnnConvolutionForward(handle.raw_handle(),
+                                           &alpha, x.desc(), x.dev_mem(),
+                                           w.desc(), w.dev_mem(),
+                                           desc_, algo,
+                                           workspace, workspace_size,
+                                           &beta, y->desc(), y->dev_mem()));
+  }
+
   // cudnnConvolutionBiasActivationForward
 
   // cudnnConvolutionBackwardBias

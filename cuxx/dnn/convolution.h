@@ -132,19 +132,47 @@ class Convolution {
                                            &beta, y->desc(), y->dev_mem()));
   }
 
-  // cudnnConvolutionBiasActivationForward
+  // TODO: cudnnConvolutionBiasActivationForward
 
-  // cudnnConvolutionBackwardBias
-  // cudnnConvolutionBackwardData
-  // cudnnConvolutionBackwardFilter
-  // cudnnFindConvolutionBackwardDataAlgorithmEx
-  // cudnnFindConvolutionBackwardFilterAlgorithmEx
-  // cudnnGetConvolutionBackwardDataAlgorithmMaxCount
-  // cudnnGetConvolutionBackwardDataAlgorithm_v7
-  // cudnnGetConvolutionBackwardDataWorkspaceSize
+  static int GetBackwardDataAlgorithmMaxCount(const Handle& handle) {
+    int count = 0;
+    CUXX_DNN_CHECK(cudnnGetConvolutionBackwardDataAlgorithmMaxCount(
+        handle.raw_handle(), &count));
+    return count;
+  }
+
+  void GetBackwardDataAlgorithm(
+      const Handle& handle, const Filter<TensorT>& w,
+      const Tensor<TensorT>& dy, const Tensor<TensorT>& dx,
+      const int requested_algo_count, int *returned_algo_count,
+      cudnnConvolutionBwdDataAlgoPerf_t *results) const {
+    CUXX_DNN_CHECK(cudnnGetConvolutionBackwardDataAlgorithm_v7(
+                       handle.raw_handle(), w.desc(), dy.desc(), desc_,
+                       dx.desc(), requested_algo_count, returned_algo_count,
+                       results));
+  }
+
+  size_t GetBackwardDataWorkspaceSize(
+      const Handle& handle, const Filter<TensorT>& w, const Tensor<TensorT>& dy,
+      const Tensor<TensorT>& dx, cudnnConvolutionBwdDataAlgo_t algo) const {
+    size_t size = 0;
+    CUXX_DNN_CHECK(cudnnGetConvolutionBackwardDataWorkspaceSize(
+                       handle.raw_handle(), w.desc(), dy.desc(), desc_,
+                       dx.desc(), algo, &size));
+    return size;
+  }
+
   // cudnnGetConvolutionBackwardFilterAlgorithmMaxCount
   // cudnnGetConvolutionBackwardFilterAlgorithm_v7
   // cudnnGetConvolutionBackwardFilterWorkspaceSize
+
+  // cudnnFindConvolutionBackwardDataAlgorithmEx
+  // cudnnFindConvolutionBackwardFilterAlgorithmEx
+
+  // cudnnConvolutionBackwardData
+  // cudnnConvolutionBackwardFilter
+
+  // cudnnConvolutionBackwardBias
 
   ~Convolution() {
     CUXX_DNN_CHECK(cudnnDestroyConvolutionDescriptor(desc_));

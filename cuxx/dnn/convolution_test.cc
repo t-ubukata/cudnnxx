@@ -47,7 +47,6 @@ TEST_F(ConvolutionTest, TestGetForwardAlgorithmMaxCount) {
                                  CUDNN_DATA_FLOAT);
   int count = conv.GetForwardAlgorithmMaxCount(handle);
   CUXX_UNUSED_VAR(count);
-  SUCCEED();
 }
 
 // No value check.
@@ -78,7 +77,7 @@ TEST_F(ConvolutionTest, TestGetForwardAlgorithm) {
   size_t w_size = sizeof(float) * n_w_elem;
   float w_host[n_w_elem] = {};
   for (int i = 0; i < n_w_elem; ++i) {
-    x_host[i] = i * 0.00001;
+    w_host[i] = i * 0.00001;
   }
   float* w_dev = nullptr;
   CUXX_CUDA_CHECK(cudaMalloc(&w_dev, w_size));
@@ -151,7 +150,7 @@ TEST_F(ConvolutionTest, TestGetForwardWorkspaceSize) {
                   y_dev);
 
   const size_t size = conv.GetForwardWorkspaceSize(handle, x, w, y,
-                              CUDNN_CONVOLUTION_FWD_ALGO_GEMM);
+                               CUDNN_CONVOLUTION_FWD_ALGO_GEMM);
   CUXX_UNUSED_VAR(size);
   CUXX_CUDA_CHECK(cudaFree(y_dev));
   CUXX_CUDA_CHECK(cudaFree(w_dev));
@@ -200,7 +199,7 @@ TEST_F(ConvolutionTest, TestFindForwardAlgorithm) {
                   y_dev);
 
   const size_t ws_size = conv.GetForwardWorkspaceSize(handle, x, w, y,
-                             CUDNN_CONVOLUTION_FWD_ALGO_GEMM);
+                              CUDNN_CONVOLUTION_FWD_ALGO_GEMM);
   int returned_algo_count = 0;
   cudnnConvolutionFwdAlgoPerf_t results[8];
   void* ws = nullptr;
@@ -286,7 +285,7 @@ TEST_F(ConvolutionTest, TestForward) {
   size_t w_size = sizeof(float) * n_w_elem;
   float w_host[n_w_elem] = {};
   for (int i = 0; i < n_w_elem; ++i) {
-    x_host[i] = i * 0.00001;
+    w_host[i] = i * 0.00001;
   }
   float* w_dev = nullptr;
   CUXX_CUDA_CHECK(cudaMalloc(&w_dev, w_size));
@@ -307,15 +306,11 @@ TEST_F(ConvolutionTest, TestForward) {
 
   constexpr auto algo = CUDNN_CONVOLUTION_FWD_ALGO_GEMM;
   const size_t ws_size = conv.GetForwardWorkspaceSize(handle, x, w, y, algo);
-  int returned_algo_count = 0;
-  cudnnConvolutionFwdAlgoPerf_t results[8];
   void* ws = nullptr;
   CUXX_CUDA_CHECK(cudaMalloc(&ws, ws_size));
-  conv.FindForwardAlgorithm(handle, x, w, y, 8, &returned_algo_count, results,
-                            ws, ws_size);
 
   constexpr float alpha = 1;
-  constexpr float beta = 1;
+  constexpr float beta = 0;
   conv.Forward(handle, alpha, x, w, algo, ws, ws_size, beta, &y);
   float y_host[n_y_elem] = {};
   CUXX_CUDA_CHECK(cudaMemcpy(y_host, y_dev, y_size, cudaMemcpyDeviceToHost));
@@ -334,7 +329,7 @@ TEST_F(ConvolutionTest, TestForward) {
   CUXX_CUDA_CHECK(cudaMemcpy(y_host_ref, y_dev_ref, y_size,
                              cudaMemcpyDeviceToHost));
 
-  for (size_t i = 0; i < n_y_elem; ++i) {
+  for (int i = 0; i < n_y_elem; ++i) {
     EXPECT_EQ(y_host_ref[i], y_host[i]) << "Group does not match: " << i;
   }
 
@@ -343,6 +338,123 @@ TEST_F(ConvolutionTest, TestForward) {
   CUXX_CUDA_CHECK(cudaFree(y_dev));
   CUXX_CUDA_CHECK(cudaFree(w_dev));
   CUXX_CUDA_CHECK(cudaFree(x_dev));
+}
+
+// No value check.
+TEST_F(ConvolutionTest, TestGetBackwardDataAlgorithmMaxCount) {
+  Convolution<float, float> conv(4, 4, 2, 2, 2, 2, CUDNN_CONVOLUTION,
+                                 CUDNN_DATA_FLOAT);
+  int count = conv.GetBackwardDataAlgorithmMaxCount(handle);
+  CUXX_UNUSED_VAR(count);
+}
+
+// No value check.
+TEST_F(ConvolutionTest, TestGetBackwardDataAlgorithm) {
+  Convolution<float, float> conv(0, 0, 1, 2, 1, 1, CUDNN_CONVOLUTION,
+                                 CUDNN_DATA_FLOAT);
+
+  constexpr int w_k = 4;  // The number of output feature maps.
+  constexpr int w_c = 3;  // The number of input feature maps.
+  constexpr int w_h = 3;  // The height of each filter.
+  constexpr int w_w = 3;  // The width of each filter.
+  constexpr int n_w_elem = w_k * w_c * w_h * w_w;
+  size_t w_size = sizeof(float) * n_w_elem;
+  float w_host[n_w_elem] = {};
+  for (int i = 0; i < n_w_elem; ++i) {
+    w_host[i] = i * 0.00001;
+  }
+  float* w_dev = nullptr;
+  CUXX_CUDA_CHECK(cudaMalloc(&w_dev, w_size));
+  CUXX_CUDA_CHECK(cudaMemcpy(w_dev, w_host, w_size, cudaMemcpyHostToDevice));
+  Filter<float> w(CUDNN_DATA_FLOAT, CUDNN_TENSOR_NCHW, w_k, w_c, w_h, w_w,
+                  w_dev);
+
+  constexpr int dy_n = 32;
+  constexpr int dy_c = 3;
+  constexpr int dy_h = 6;
+  constexpr int dy_w = 4;
+  constexpr int n_dy_elem = dy_n * dy_c * dy_h * dy_w;
+  size_t dy_size = sizeof(float) * n_dy_elem;
+  float dy_host[n_dy_elem] = {};
+  for (int i = 0; i < n_dy_elem; ++i) {
+    dy_host[i] = i * 0.0001;
+  }
+  float* dy_dev = nullptr;
+  CUXX_CUDA_CHECK(cudaMalloc(&dy_dev, dy_size));
+  CUXX_CUDA_CHECK(cudaMemcpy(dy_dev, dy_host, dy_size, cudaMemcpyHostToDevice));
+  Tensor<float> dy(CUDNN_DATA_FLOAT, CUDNN_TENSOR_NCHW, dy_n, dy_c, dy_h, dy_w,
+                   dy_dev);
+
+  constexpr int dx_n = 32;
+  constexpr int dx_c = 4;
+  constexpr int dx_h = 4;
+  constexpr int dx_w = 1;
+  constexpr int n_dx_elem = dx_n * dx_c * dx_h * dx_w;
+  size_t dx_size = sizeof(float) * n_dx_elem;
+  float* dx_dev = nullptr;
+  CUXX_CUDA_CHECK(cudaMalloc(&dx_dev, dx_size));
+  Tensor<float> dx(CUDNN_DATA_FLOAT, CUDNN_TENSOR_NCHW, dx_n, dx_c, dx_h, dx_w,
+                   dx_dev);
+
+  int requested_count = conv.GetBackwardDataAlgorithmMaxCount(handle);
+  int returned_count = 0;
+  std::vector<cudnnConvolutionBwdDataAlgoPerf_t> results_vec(requested_count);
+  conv.GetBackwardDataAlgorithm(handle, w, dy, dx, requested_count,
+                                &returned_count, results_vec.data());
+
+  CUXX_CUDA_CHECK(cudaFree(dx_dev));
+  CUXX_CUDA_CHECK(cudaFree(w_dev));
+  CUXX_CUDA_CHECK(cudaFree(dy_dev));
+  EXPECT_EQ(requested_count, returned_count) << "Count does not match.";
+}
+
+// No value check.
+TEST_F(ConvolutionTest, TestGetBackwardDataWorkspaceSize) {
+  Convolution<float, float> conv(0, 0, 2, 2, 1, 1, CUDNN_CONVOLUTION,
+                                 CUDNN_DATA_FLOAT);
+  constexpr int dy_n = 2;
+  constexpr int dy_c = 3;
+  constexpr int dy_h = 6;
+  constexpr int dy_w = 4;
+  constexpr int n_dy_elem = dy_n * dy_c * dy_h * dy_w;
+  size_t dy_size = sizeof(float) * n_dy_elem;
+  float dy_host[n_dy_elem] = {};
+  float* dy_dev = nullptr;
+  CUXX_CUDA_CHECK(cudaMalloc(&dy_dev, dy_size));
+  CUXX_CUDA_CHECK(cudaMemcpy(dy_dev, dy_host, dy_size, cudaMemcpyHostToDevice));
+  Tensor<float> dy(CUDNN_DATA_FLOAT, CUDNN_TENSOR_NCHW, dy_n, dy_c, dy_h, dy_w,
+                   dy_dev);
+
+  constexpr int w_k = 4;  // The number of output feature maps.
+  constexpr int w_c = 3;  // The number of input feature maps.
+  constexpr int w_h = 3;  // The height of each filter.
+  constexpr int w_w = 3;  // The width of each filter.
+  constexpr int n_w_elem = w_k * w_c * w_h * w_w;
+  size_t w_size = sizeof(float) * n_w_elem;
+  float w_host[n_w_elem] = {};
+  float* w_dev = nullptr;
+  CUXX_CUDA_CHECK(cudaMalloc(&w_dev, w_size));
+  CUXX_CUDA_CHECK(cudaMemcpy(w_dev, w_host, w_size, cudaMemcpyHostToDevice));
+  Filter<float> w(CUDNN_DATA_FLOAT, CUDNN_TENSOR_NCHW, w_k, w_c, w_h, w_w,
+                  w_dev);
+
+  constexpr int dx_n = 2;
+  constexpr int dx_c = 4;
+  constexpr int dx_h = 4;
+  constexpr int dx_w = 1;
+  constexpr int n_dx_elem = dx_n * dx_c * dx_h * dx_w;
+  size_t dx_size = sizeof(float) * n_dx_elem;
+  float* dx_dev = nullptr;
+  CUXX_CUDA_CHECK(cudaMalloc(&dx_dev, dx_size));
+  Tensor<float> dx(CUDNN_DATA_FLOAT, CUDNN_TENSOR_NCHW, dx_n, dx_c, dx_h, dx_w,
+                   dx_dev);
+
+  const size_t size = conv.GetBackwardDataWorkspaceSize(handle, w, dy, dx,
+                               CUDNN_CONVOLUTION_BWD_DATA_ALGO_1);
+  CUXX_UNUSED_VAR(size);
+  CUXX_CUDA_CHECK(cudaFree(dx_dev));
+  CUXX_CUDA_CHECK(cudaFree(w_dev));
+  CUXX_CUDA_CHECK(cudaFree(dy_dev));
 }
 
 }  // namespace dnn

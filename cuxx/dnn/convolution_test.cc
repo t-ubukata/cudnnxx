@@ -350,7 +350,7 @@ TEST_F(ConvolutionTest, TestGetBackwardDataAlgorithmMaxCount) {
 
 // No value check.
 TEST_F(ConvolutionTest, TestGetBackwardDataAlgorithm) {
-  Convolution<float, float> conv(0, 0, 1, 2, 1, 1, CUDNN_CONVOLUTION,
+  Convolution<float, float> conv(0, 0, 2, 2, 1, 1, CUDNN_CONVOLUTION,
                                  CUDNN_DATA_FLOAT);
 
   constexpr int w_k = 4;  // The number of output feature maps.
@@ -370,9 +370,9 @@ TEST_F(ConvolutionTest, TestGetBackwardDataAlgorithm) {
                   w_dev);
 
   constexpr int dy_n = 32;
-  constexpr int dy_c = 3;
-  constexpr int dy_h = 6;
-  constexpr int dy_w = 4;
+  constexpr int dy_c = 4;
+  constexpr int dy_h = 2;
+  constexpr int dy_w = 1;
   constexpr int n_dy_elem = dy_n * dy_c * dy_h * dy_w;
   size_t dy_size = sizeof(float) * n_dy_elem;
   float dy_host[n_dy_elem] = {};
@@ -386,9 +386,9 @@ TEST_F(ConvolutionTest, TestGetBackwardDataAlgorithm) {
                    dy_dev);
 
   constexpr int dx_n = 32;
-  constexpr int dx_c = 4;
-  constexpr int dx_h = 4;
-  constexpr int dx_w = 1;
+  constexpr int dx_c = 3;
+  constexpr int dx_h = 6;
+  constexpr int dx_w = 4;
   constexpr int n_dx_elem = dx_n * dx_c * dx_h * dx_w;
   size_t dx_size = sizeof(float) * n_dx_elem;
   float* dx_dev = nullptr;
@@ -412,18 +412,6 @@ TEST_F(ConvolutionTest, TestGetBackwardDataAlgorithm) {
 TEST_F(ConvolutionTest, TestGetBackwardDataWorkspaceSize) {
   Convolution<float, float> conv(0, 0, 2, 2, 1, 1, CUDNN_CONVOLUTION,
                                  CUDNN_DATA_FLOAT);
-  constexpr int dy_n = 2;
-  constexpr int dy_c = 3;
-  constexpr int dy_h = 6;
-  constexpr int dy_w = 4;
-  constexpr int n_dy_elem = dy_n * dy_c * dy_h * dy_w;
-  size_t dy_size = sizeof(float) * n_dy_elem;
-  float dy_host[n_dy_elem] = {};
-  float* dy_dev = nullptr;
-  CUXX_CUDA_CHECK(cudaMalloc(&dy_dev, dy_size));
-  CUXX_CUDA_CHECK(cudaMemcpy(dy_dev, dy_host, dy_size, cudaMemcpyHostToDevice));
-  Tensor<float> dy(CUDNN_DATA_FLOAT, CUDNN_TENSOR_NCHW, dy_n, dy_c, dy_h, dy_w,
-                   dy_dev);
 
   constexpr int w_k = 4;  // The number of output feature maps.
   constexpr int w_c = 3;  // The number of input feature maps.
@@ -438,10 +426,23 @@ TEST_F(ConvolutionTest, TestGetBackwardDataWorkspaceSize) {
   Filter<float> w(CUDNN_DATA_FLOAT, CUDNN_TENSOR_NCHW, w_k, w_c, w_h, w_w,
                   w_dev);
 
-  constexpr int dx_n = 2;
-  constexpr int dx_c = 4;
-  constexpr int dx_h = 4;
-  constexpr int dx_w = 1;
+  constexpr int dy_n = 32;
+  constexpr int dy_c = 4;
+  constexpr int dy_h = 2;
+  constexpr int dy_w = 1;
+  constexpr int n_dy_elem = dy_n * dy_c * dy_h * dy_w;
+  size_t dy_size = sizeof(float) * n_dy_elem;
+  float dy_host[n_dy_elem] = {};
+  float* dy_dev = nullptr;
+  CUXX_CUDA_CHECK(cudaMalloc(&dy_dev, dy_size));
+  CUXX_CUDA_CHECK(cudaMemcpy(dy_dev, dy_host, dy_size, cudaMemcpyHostToDevice));
+  Tensor<float> dy(CUDNN_DATA_FLOAT, CUDNN_TENSOR_NCHW, dy_n, dy_c, dy_h, dy_w,
+                   dy_dev);
+
+  constexpr int dx_n = 32;
+  constexpr int dx_c = 3;
+  constexpr int dx_h = 6;
+  constexpr int dx_w = 4;
   constexpr int n_dx_elem = dx_n * dx_c * dx_h * dx_w;
   size_t dx_size = sizeof(float) * n_dx_elem;
   float* dx_dev = nullptr;

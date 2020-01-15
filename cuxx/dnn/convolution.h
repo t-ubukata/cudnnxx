@@ -162,14 +162,29 @@ class Convolution {
     return size;
   }
 
+  void FindBackwardDataAlgorithm(const Handle& handle, const Filter<TensorT>& w,
+                                 const Tensor<TensorT>& dy,
+                                 const Tensor<TensorT>& dx,
+                                 const int requested_algo_count,
+                                 int* returned_algo_count,
+                                 cudnnConvolutionBwdDataAlgoPerf_t* results,
+                                 void* workspace,
+                                 size_t workspace_size_in_bytes) const {
+    CUXX_DNN_CHECK(cudnnFindConvolutionBackwardDataAlgorithmEx(
+                       handle.raw_handle(), w.desc(), w.dev_mem(),
+                       dy.desc(), dy.dev_mem(),
+                       desc_,
+                       dx.desc(), dx.dev_mem(),
+                       requested_algo_count, returned_algo_count,
+                       results, workspace, workspace_size_in_bytes));
+  }
+
+  // cudnnConvolutionBackwardData
+
   // cudnnGetConvolutionBackwardFilterAlgorithmMaxCount
   // cudnnGetConvolutionBackwardFilterAlgorithm_v7
   // cudnnGetConvolutionBackwardFilterWorkspaceSize
-
-  // cudnnFindConvolutionBackwardDataAlgorithmEx
   // cudnnFindConvolutionBackwardFilterAlgorithmEx
-
-  // cudnnConvolutionBackwardData
   // cudnnConvolutionBackwardFilter
 
   // cudnnConvolutionBackwardBias

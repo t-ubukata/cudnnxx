@@ -30,7 +30,7 @@ TEST_F(ConvolutionTest, TestGroupCount) {
                                  CUDNN_DATA_FLOAT);
   constexpr int count = 2;
   conv.SetGroupCount(count);
-  EXPECT_EQ(count, conv.GetGroupCount()) << "Group does not match.";
+  EXPECT_EQ(count, conv.GetGroupCount()) << "Group count does not match.";
 }
 
 TEST_F(ConvolutionTest, TestMathType) {
@@ -223,7 +223,7 @@ TEST_F(ConvolutionTest, TestForward) {
                              cudaMemcpyDeviceToHost));
 
   for (int i = 0; i < n_y_elem; ++i) {
-    EXPECT_EQ(y_host_ref[i], y_host[i]) << "Group does not match: " << i;
+    EXPECT_EQ(y_host_ref[i], y_host[i]) << "Value does not match: " << i;
   }
 
   CUXX_CUDA_CHECK(cudaFree(y_dev_ref));
@@ -406,7 +406,7 @@ TEST_F(ConvolutionTest, TestBackwardData) {
                              cudaMemcpyDeviceToHost));
 
   for (int i = 0; i < n_dx_elem; ++i) {
-    EXPECT_EQ(dx_host_ref[i], dx_host[i]) << "Group does not match: " << i;
+    EXPECT_EQ(dx_host_ref[i], dx_host[i]) << "Value does not match: " << i;
   }
 
   CUXX_CUDA_CHECK(cudaFree(dx_dev_ref));
@@ -415,5 +415,41 @@ TEST_F(ConvolutionTest, TestBackwardData) {
   CUXX_CUDA_CHECK(cudaFree(dy_dev));
   CUXX_CUDA_CHECK(cudaFree(w_dev));
 }
+
+// No value check.
+TEST_F(ConvolutionTest, TestGetBackwardFilterAlgorithmMaxCount) {
+  Convolution<float, float> conv(4, 4, 2, 2, 2, 2, CUDNN_CONVOLUTION,
+                                 CUDNN_DATA_FLOAT);
+  int count = conv.GetBackwardFilterAlgorithmMaxCount(handle);
+  CUXX_UNUSED_VAR(count);
+}
+
+// No value check.
+TEST_F(ConvolutionTest, TestGetBackwardFilterAlgorithm) {
+  Convolution<float, float> conv(0, 0, 2, 2, 1, 1, CUDNN_CONVOLUTION,
+                                 CUDNN_DATA_FLOAT);
+  Tensor<float> x(CUDNN_DATA_FLOAT, CUDNN_TENSOR_NCHW, 32, 3, 6, 4, nullptr);
+  Tensor<float> dy(CUDNN_DATA_FLOAT, CUDNN_TENSOR_NCHW, 32, 4, 2, 1, nullptr);
+  Filter<float> dw(CUDNN_DATA_FLOAT, CUDNN_TENSOR_NCHW, 4, 3, 3, 3, nullptr);
+  int requested_count = conv.GetBackwardFilterAlgorithmMaxCount(handle);
+  int returned_count = 0;
+  std::vector<cudnnConvolutionBwdFilterAlgoPerf_t> results_vec(requested_count);
+  conv.GetBackwardFilterAlgorithm(handle, x, dy, dw, requested_count,
+                                &returned_count, results_vec.data());
+  EXPECT_EQ(requested_count, returned_count) << "Count does not match.";
+}
+
+// No value check.
+TEST_F(ConvolutionTest, TestGetBackwardFilterWorkspaceSize) {
+  Convolution<float, float> conv(0, 0, 2, 2, 1, 1, CUDNN_CONVOLUTION,
+                                 CUDNN_DATA_FLOAT);
+  Tensor<float> x(CUDNN_DATA_FLOAT, CUDNN_TENSOR_NCHW, 32, 3, 6, 4, nullptr);
+  Tensor<float> dy(CUDNN_DATA_FLOAT, CUDNN_TENSOR_NCHW, 32, 4, 2, 1, nullptr);
+  Filter<float> dw(CUDNN_DATA_FLOAT, CUDNN_TENSOR_NCHW, 4, 3, 3, 3, nullptr);
+  size_t size = conv.GetBackwardFilterWorkspaceSize(handle, x, dy, dw,
+                         CUDNN_CONVOLUTION_BWD_FILTER_ALGO_1);
+  CUXX_UNUSED_VAR(size);
+}
+
 }  // namespace dnn
 }  // namespace cuxx

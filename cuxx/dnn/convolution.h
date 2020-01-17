@@ -179,7 +179,19 @@ class Convolution {
                        results, workspace, workspace_size_in_bytes));
   }
 
-  // cudnnConvolutionBackwardData
+  void BackwardData(const Handle& handle, FactorT alpha,
+                    const Filter<TensorT>& w, const Tensor<TensorT>& dy,
+                    cudnnConvolutionBwdDataAlgo_t algo,
+                    void* workspace, size_t workspace_size,
+                    FactorT beta, Tensor<TensorT>* dx) const {
+    CUXX_DNN_CHECK(cudnnConvolutionBackwardData(handle.raw_handle(),
+                                                &alpha, w.desc(), w.dev_mem(),
+                                                dy.desc(), dy.dev_mem(),
+                                                desc_, algo,
+                                                workspace, workspace_size,
+                                                &beta,
+                                                dx->desc(), dx->dev_mem()));
+  }
 
   // cudnnGetConvolutionBackwardFilterAlgorithmMaxCount
   // cudnnGetConvolutionBackwardFilterAlgorithm_v7

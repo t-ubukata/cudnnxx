@@ -33,6 +33,15 @@ class Convolution {
                                                    mode, dtype));
   }
 
+  ~Convolution() {
+    CUXX_DNN_CHECK(cudnnDestroyConvolutionDescriptor(desc_));
+  }
+
+  Convolution(const Convolution&) = delete;
+  Convolution operator=(const Convolution&) = delete;
+
+  cudnnConvolutionDescriptor_t desc() const {return desc_;}
+
   void SetGroupCount(int group_count) {
     CUXX_DNN_CHECK(cudnnSetConvolutionGroupCount(desc_, group_count));
   }
@@ -257,15 +266,6 @@ class Convolution {
   }
 
   // cudnnConvolutionBackwardBias
-
-  ~Convolution() {
-    CUXX_DNN_CHECK(cudnnDestroyConvolutionDescriptor(desc_));
-  }
-
-  Convolution(const Convolution&) = delete;
-  Convolution operator=(const Convolution&) = delete;
-
-  cudnnConvolutionDescriptor_t desc() const {return desc_;}
 
  private:
   cudnnConvolutionDescriptor_t desc_;

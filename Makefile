@@ -35,8 +35,10 @@ TEST_BIN_DIR := ./test_bin
 test: $(TEST_BIN_DIR)/gtest_main
 	./test_bin/gtest_main
 
-TEST_OBJS := $(OBJ_DIR)/common_test.o $(OBJ_DIR)/op_tensor_test.o \
-             $(OBJ_DIR)/convolution_test.o
+TEST_OBJS := $(OBJ_DIR)/common_test.o \
+             $(OBJ_DIR)/op_tensor_test.o \
+             $(OBJ_DIR)/convolution_test.o \
+             $(OBJ_DIR)/activation_test.o
 
 # Google Test.
 GTEST_TARGET := $(GTEST_DIR)/googletest/libgtest_main.a
@@ -57,6 +59,9 @@ $(OBJ_DIR)/op_tensor_test.o: $(SRC_DIR)/dnn/op_tensor_test.cc
 	$(CXX) $(CXXFLAGS) $^ -c -o $@
 
 $(OBJ_DIR)/convolution_test.o: $(SRC_DIR)/dnn/convolution_test.cc
+	$(CXX) $(CXXFLAGS) $^ -c -o $@
+
+$(OBJ_DIR)/activation_test.o: $(SRC_DIR)/dnn/activation_test.cc
 	$(CXX) $(CXXFLAGS) $^ -c -o $@
 
 clean:

@@ -38,4 +38,7 @@
 
 #define CUXX_UNUSED_VAR(VAR) static_cast<void>((VAR));
 
+#define CUXX_CHECK(COND, MSG) \
+  do {if (!(COND)) {CUXX_LOG_FATAL((MSG));}} while (false)
+
 #endif  // CUXX_UTIL_H_

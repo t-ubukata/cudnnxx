@@ -3,7 +3,6 @@
 
 // TODO(t-ubukata):
 // Op
-//   activation
 //   batch_norm
 //   dropout
 //   pooling
@@ -19,4 +18,4 @@
 // Mutex.
 // Consider about type constraints.
 // Consider about copy constructors and move constructors.
-// Considet about mutation.
+// Consider about mutation.

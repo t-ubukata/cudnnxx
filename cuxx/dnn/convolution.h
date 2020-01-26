@@ -223,9 +223,38 @@ class Convolution {
     return size;
   }
 
-  // cudnnFindConvolutionBackwardFilterAlgorithmEx
+  void FindBackwardFilterAlgorithm(const Handle& handle,
+                                   const Tensor<TensorT>& x,
+                                   const Tensor<TensorT>& dy,
+                                   const Filter<TensorT>& dw,
+                                   const int requested_algo_count,
+                                   int* returned_algo_count,
+                                   cudnnConvolutionBwdFilterAlgoPerf_t* results,
+                                   void* workspace,
+                                   size_t workspace_size_in_bytes) const {
+    CUXX_DNN_CHECK(cudnnFindConvolutionBackwardFilterAlgorithmEx(
+                       handle.raw_handle(), x.desc(), x.dev_mem(),
+                       dy.desc(), dy.dev_mem(),
+                       desc_,
+                       dw.desc(), dw.dev_mem(),
+                       requested_algo_count, returned_algo_count,
+                       results, workspace, workspace_size_in_bytes));
+  }
 
-  // cudnnConvolutionBackwardFilter
+  void BackwardFilter(const Handle& handle, FactorT alpha,
+                      const Tensor<TensorT>& x, const Tensor<TensorT>& dy,
+                      cudnnConvolutionBwdFilterAlgo_t algo,
+                      void* workspace, size_t workspace_size,
+                      FactorT beta, Filter<TensorT>* dw) const {
+      CUXX_DNN_CHECK(cudnnConvolutionBackwardFilter(handle.raw_handle(),
+                                                    &alpha,
+                                                    x.desc(), x.dev_mem(),
+                                                    dy.desc(), dy.dev_mem(),
+                                                    desc_, algo,
+                                                    workspace, workspace_size,
+                                                    &beta,
+                                                    dw->desc(), dw->dev_mem()));
+  }
 
   // cudnnConvolutionBackwardBias
 

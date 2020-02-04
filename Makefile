@@ -20,11 +20,13 @@ SRC_DIR := ./cuxx
 
 $(OBJ_DIR)/common.o: $(SRC_DIR)/dnn/common.cc
 	$(CXX) $(CXXFLAGS) $^ -c -o $@
-
 $(OBJ_DIR)/op_tensor.o: $(SRC_DIR)/dnn/op_tensor.cc
 	$(CXX) $(CXXFLAGS) $^ -c -o $@
-
 $(OBJ_DIR)/convolution.o: $(SRC_DIR)/dnn/convolution.cc
+	$(CXX) $(CXXFLAGS) $^ -c -o $@
+$(OBJ_DIR)/activation.o: $(SRC_DIR)/dnn/activation.cc
+	$(CXX) $(CXXFLAGS) $^ -c -o $@
+$(OBJ_DIR)/reduce_tensor.o: $(SRC_DIR)/dnn/reduce_tensor.cc
 	$(CXX) $(CXXFLAGS) $^ -c -o $@
 
 .PHONY: test clean
@@ -38,7 +40,8 @@ test: $(TEST_BIN_DIR)/gtest_main
 TEST_OBJS := $(OBJ_DIR)/common_test.o \
              $(OBJ_DIR)/op_tensor_test.o \
              $(OBJ_DIR)/convolution_test.o \
-             $(OBJ_DIR)/activation_test.o
+             $(OBJ_DIR)/activation_test.o \
+             $(OBJ_DIR)/reduce_tensor_test.o
 
 # Google Test.
 GTEST_TARGET := $(GTEST_DIR)/googletest/libgtest_main.a
@@ -54,14 +57,13 @@ $(TEST_BIN_DIR)/gtest_main: $(OBJS) $(TEST_OBJS) $(GTEST_TARGET)
 
 $(OBJ_DIR)/common_test.o: $(SRC_DIR)/dnn/common_test.cc
 	$(CXX) $(CXXFLAGS) $^ -c -o $@
-
 $(OBJ_DIR)/op_tensor_test.o: $(SRC_DIR)/dnn/op_tensor_test.cc
 	$(CXX) $(CXXFLAGS) $^ -c -o $@
-
 $(OBJ_DIR)/convolution_test.o: $(SRC_DIR)/dnn/convolution_test.cc
 	$(CXX) $(CXXFLAGS) $^ -c -o $@
-
 $(OBJ_DIR)/activation_test.o: $(SRC_DIR)/dnn/activation_test.cc
+	$(CXX) $(CXXFLAGS) $^ -c -o $@
+$(OBJ_DIR)/reduce_tensor_test.o: $(SRC_DIR)/dnn/reduce_tensor_test.cc
 	$(CXX) $(CXXFLAGS) $^ -c -o $@
 
 clean:

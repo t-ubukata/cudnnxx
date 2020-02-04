@@ -1,3 +1,6 @@
+#ifndef CUXX_DNN_DNN_H_
+#define CUXX_DNN_DNN_H_
+
 #include "cuxx/dnn/common.h"
 #include "cuxx/dnn/op_tensor.h"
 
@@ -6,9 +9,7 @@
 //   batch_norm
 //   dropout
 //   pooling
-//   reduce_tensor
 //   rnn
-//   softmax
 //   divisive_normalization
 //   CTCLoss
 //   Algorithm
@@ -19,3 +20,5 @@
 // Consider about type constraints.
 // Consider about copy constructors and move constructors.
 // Consider about mutation.
+
+#endif  // CUXX_DNN_DNN_H_

@@ -1,5 +1,3 @@
-#include <vector>
-
 #include "gtest/gtest.h"
 #include "cudnnxx/activation.h"
 

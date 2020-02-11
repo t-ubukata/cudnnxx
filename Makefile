@@ -28,6 +28,8 @@ $(OBJ_DIR)/activation.o: $(SRC_DIR)/activation.cc
 	$(CXX) $(CXXFLAGS) $^ -c -o $@
 $(OBJ_DIR)/reduce_tensor.o: $(SRC_DIR)/reduce_tensor.cc
 	$(CXX) $(CXXFLAGS) $^ -c -o $@
+$(OBJ_DIR)/pooling.o: $(SRC_DIR)/pooling.cc
+	$(CXX) $(CXXFLAGS) $^ -c -o $@
 
 .PHONY: test clean
 
@@ -41,7 +43,10 @@ TEST_OBJS := $(OBJ_DIR)/common_test.o \
              $(OBJ_DIR)/op_tensor_test.o \
              $(OBJ_DIR)/convolution_test.o \
              $(OBJ_DIR)/activation_test.o \
-             $(OBJ_DIR)/reduce_tensor_test.o
+             $(OBJ_DIR)/reduce_tensor_test.o \
+             $(OBJ_DIR)/pooling_test.o \
+             $(OBJ_DIR)/example_test.o
+
 
 # Google Test.
 GTEST_TARGET := $(GTEST_DIR)/googletest/libgtest_main.a
@@ -65,6 +70,10 @@ $(OBJ_DIR)/activation_test.o: $(SRC_DIR)/activation_test.cc
 	$(CXX) $(CXXFLAGS) $^ -c -o $@
 $(OBJ_DIR)/reduce_tensor_test.o: $(SRC_DIR)/reduce_tensor_test.cc
 	$(CXX) $(CXXFLAGS) $^ -c -o $@
+$(OBJ_DIR)/pooling_test.o: $(SRC_DIR)/pooling_test.cc
+	$(CXX) $(CXXFLAGS) $^ -c -o $@
+$(OBJ_DIR)/example_test.o: $(SRC_DIR)/example_test.cc $(TARGET_LIB)
+	$(CXX) $(CXXFLAGS) $(SRC_DIR)/example_test.cc -c -o $@
 
 clean:
 	$(RM) $(OBJ_DIR)/* $(TARGET_LIB) $(TEST_BIN_DIR)/* \

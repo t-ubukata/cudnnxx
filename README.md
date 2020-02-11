@@ -1,4 +1,4 @@
-# cuxx
+# cudnnxx
 
 cuDNN C++ wrapper.
 

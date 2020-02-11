@@ -1,10 +1,9 @@
 #include <vector>
 
 #include "gtest/gtest.h"
-#include "cuxx/dnn/activation.h"
+#include "cudnnxx/activation.h"
 
-namespace cuxx {
-namespace dnn {
+namespace cudnnxx {
 
 class ActivationTest : public ::testing::Test {
  protected:
@@ -34,19 +33,19 @@ TEST_F(ActivationTest, TestForward) {
                            0.1,  0.2,  0.3,  0.4,  0.5,  0.6,
                            0.7,  0.8,  0.9,  1.0,  1.1,  1.2};
   float* x_dev;
-  CUXX_CUDA_CHECK(cudaMalloc(&x_dev, size));
-  CUXX_CUDA_CHECK(cudaMemcpy(x_dev, x_host, size, cudaMemcpyHostToDevice));
+  CUDNNXX_CUDA_CHECK(cudaMalloc(&x_dev, size));
+  CUDNNXX_CUDA_CHECK(cudaMemcpy(x_dev, x_host, size, cudaMemcpyHostToDevice));
   Tensor<float> x(CUDNN_DATA_FLOAT, CUDNN_TENSOR_NCHW, n, c, h, w, x_dev);
 
   float* y_dev;
-  CUXX_CUDA_CHECK(cudaMalloc(&y_dev, size));
+  CUDNNXX_CUDA_CHECK(cudaMalloc(&y_dev, size));
   Tensor<float> y(CUDNN_DATA_FLOAT, CUDNN_TENSOR_NCHW, n, c, h, w, y_dev);
 
   Activation<float, float> activation(CUDNN_ACTIVATION_RELU,
                                       CUDNN_NOT_PROPAGATE_NAN);
   activation.Forward(handle, 1, x, 0, &y);
   float y_host[n_elem] = {};
-  CUXX_CUDA_CHECK(cudaMemcpy(y_host, y_dev, size, cudaMemcpyDeviceToHost));
+  CUDNNXX_CUDA_CHECK(cudaMemcpy(y_host, y_dev, size, cudaMemcpyDeviceToHost));
   float y_expected[n_elem] = {   0,    0,    0,    0,    0,    0,
                                  0,    0,    0,    0,    0,    0,
                                0.1,  0.2,  0.3,  0.4,  0.5,  0.6,
@@ -54,8 +53,8 @@ TEST_F(ActivationTest, TestForward) {
   for (int i = 0; i < n_elem; ++i) {
     EXPECT_NEAR(y_expected[i], y_host[i], 1e-4) << "i: " << i;
   }
-  CUXX_CUDA_CHECK(cudaFree(y_dev));
-  CUXX_CUDA_CHECK(cudaFree(x_dev));
+  CUDNNXX_CUDA_CHECK(cudaFree(y_dev));
+  CUDNNXX_CUDA_CHECK(cudaFree(x_dev));
 }
 
 TEST_F(ActivationTest, TestBackward) {
@@ -71,8 +70,8 @@ TEST_F(ActivationTest, TestBackward) {
                            0.1,  0.2,  0.3,  0.4,  0.5,  0.6,
                            0.7,  0.8,  0.9,  1.0,  1.1,  1.2};
   float* x_dev;
-  CUXX_CUDA_CHECK(cudaMalloc(&x_dev, size));
-  CUXX_CUDA_CHECK(cudaMemcpy(x_dev, x_host, size, cudaMemcpyHostToDevice));
+  CUDNNXX_CUDA_CHECK(cudaMalloc(&x_dev, size));
+  CUDNNXX_CUDA_CHECK(cudaMemcpy(x_dev, x_host, size, cudaMemcpyHostToDevice));
   Tensor<float> x(CUDNN_DATA_FLOAT, CUDNN_TENSOR_NCHW, n, c, h, w, x_dev);
 
   float y_host[n_elem] = {  0,    0,    0,    0,    0,    0,
@@ -80,8 +79,8 @@ TEST_F(ActivationTest, TestBackward) {
                           0.1,  0.2,  0.3,  0.4,  0.5,  0.6,
                           0.7,  0.8,  0.9,  1.0,  1.1,  1.2};
   float* y_dev;
-  CUXX_CUDA_CHECK(cudaMalloc(&y_dev, size));
-  CUXX_CUDA_CHECK(cudaMemcpy(y_dev, y_host, size, cudaMemcpyHostToDevice));
+  CUDNNXX_CUDA_CHECK(cudaMalloc(&y_dev, size));
+  CUDNNXX_CUDA_CHECK(cudaMemcpy(y_dev, y_host, size, cudaMemcpyHostToDevice));
   Tensor<float> y(CUDNN_DATA_FLOAT, CUDNN_TENSOR_NCHW, n, c, h, w, y_dev);
 
   float dy_host[n_elem] = {0,  0,  0,  0,  0,  0,
@@ -89,19 +88,19 @@ TEST_F(ActivationTest, TestBackward) {
                            1,  1,  1,  1,  1,  1,
                            1,  1,  1,  1,  1,  1};
   float* dy_dev;
-  CUXX_CUDA_CHECK(cudaMalloc(&dy_dev, size));
-  CUXX_CUDA_CHECK(cudaMemcpy(dy_dev, dy_host, size, cudaMemcpyHostToDevice));
+  CUDNNXX_CUDA_CHECK(cudaMalloc(&dy_dev, size));
+  CUDNNXX_CUDA_CHECK(cudaMemcpy(dy_dev, dy_host, size, cudaMemcpyHostToDevice));
   Tensor<float> dy(CUDNN_DATA_FLOAT, CUDNN_TENSOR_NCHW, n, c, h, w, dy_dev);
 
   float* dx_dev = nullptr;
-  CUXX_CUDA_CHECK(cudaMalloc(&dx_dev, size));
+  CUDNNXX_CUDA_CHECK(cudaMalloc(&dx_dev, size));
   Tensor<float> dx(CUDNN_DATA_FLOAT, CUDNN_TENSOR_NCHW, n, c, h, w, dx_dev);
 
   Activation<float, float> activation(CUDNN_ACTIVATION_RELU,
                                       CUDNN_NOT_PROPAGATE_NAN);
   activation.Backward(handle, 1, y, dy, x, 0, &dx);
   float dx_host[n_elem] = {};
-  CUXX_CUDA_CHECK(cudaMemcpy(dx_host, dx_dev, size, cudaMemcpyDeviceToHost));
+  CUDNNXX_CUDA_CHECK(cudaMemcpy(dx_host, dx_dev, size, cudaMemcpyDeviceToHost));
   float dx_expected[n_elem] = {0,  0,  0,  0,  0,  0,
                                0,  0,  0,  0,  0,  0,
                                1,  1,  1,  1,  1,  1,
@@ -109,11 +108,10 @@ TEST_F(ActivationTest, TestBackward) {
   for (int i = 0; i < n_elem; ++i) {
     EXPECT_NEAR(dx_expected[i], dx_host[i], 1e-4) << "i: " << i;
   }
-  CUXX_CUDA_CHECK(cudaFree(dx_dev));
-  CUXX_CUDA_CHECK(cudaFree(dy_dev));
-  CUXX_CUDA_CHECK(cudaFree(y_dev));
-  CUXX_CUDA_CHECK(cudaFree(x_dev));
+  CUDNNXX_CUDA_CHECK(cudaFree(dx_dev));
+  CUDNNXX_CUDA_CHECK(cudaFree(dy_dev));
+  CUDNNXX_CUDA_CHECK(cudaFree(y_dev));
+  CUDNNXX_CUDA_CHECK(cudaFree(x_dev));
 }
 
-}  // namespace dnn
-}  // namespace cuxx
+}  // namespace cudnnxx

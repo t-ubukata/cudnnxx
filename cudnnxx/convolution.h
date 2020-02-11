@@ -1,13 +1,11 @@
-#ifndef CUXX_DNN_CONVOLUTION_H_
-#define CUXX_DNN_CONVOLUTION_H_
+#ifndef CUDNNXX_CONVOLUTION_H_
+#define CUDNNXX_CONVOLUTION_H_
 
 #include "cudnn.h"
-#include "cuxx/util.h"
+#include "cudnnxx/common.h"
+#include "cudnnxx/util.h"
 
-#include "cuxx/dnn/common.h"
-
-namespace cuxx {
-namespace dnn {
+namespace cudnnxx {
 
 // FactorT must be float or double.
 template<typename TensorT, typename FactorT>
@@ -17,8 +15,8 @@ class Convolution {
   Convolution(int pad_h, int pad_w, int u, int v,
               int dilation_h, int dilation_w,
               cudnnConvolutionMode_t mode, cudnnDataType_t dtype) {
-    CUXX_DNN_CHECK(cudnnCreateConvolutionDescriptor(&desc_));
-    CUXX_DNN_CHECK(cudnnSetConvolution2dDescriptor(desc_, pad_h, pad_w, u, v,
+    CUDNNXX_DNN_CHECK(cudnnCreateConvolutionDescriptor(&desc_));
+    CUDNNXX_DNN_CHECK(cudnnSetConvolution2dDescriptor(desc_, pad_h, pad_w, u, v,
                                                    dilation_h, dilation_w,
                                                    mode, dtype));
   }
@@ -27,14 +25,14 @@ class Convolution {
   Convolution(int array_length, const int pads[], const int filter_strides[],
               const int dilations[],
               cudnnConvolutionMode_t mode, cudnnDataType_t dtype) {
-    CUXX_DNN_CHECK(cudnnCreateConvolutionDescriptor(&desc_));
-    CUXX_DNN_CHECK(cudnnSetConvolutionNdDescriptor(desc_, array_length, pads,
+    CUDNNXX_DNN_CHECK(cudnnCreateConvolutionDescriptor(&desc_));
+    CUDNNXX_DNN_CHECK(cudnnSetConvolutionNdDescriptor(desc_, array_length, pads,
                                                    filter_strides, dilations,
                                                    mode, dtype));
   }
 
   ~Convolution() {
-    CUXX_DNN_CHECK(cudnnDestroyConvolutionDescriptor(desc_));
+    CUDNNXX_DNN_CHECK(cudnnDestroyConvolutionDescriptor(desc_));
   }
 
   Convolution(const Convolution&) = delete;
@@ -43,28 +41,28 @@ class Convolution {
   cudnnConvolutionDescriptor_t desc() const {return desc_;}
 
   void SetGroupCount(int group_count) {
-    CUXX_DNN_CHECK(cudnnSetConvolutionGroupCount(desc_, group_count));
+    CUDNNXX_DNN_CHECK(cudnnSetConvolutionGroupCount(desc_, group_count));
   }
 
   int GetGroupCount() {
     int count = 0;
-    CUXX_DNN_CHECK(cudnnGetConvolutionGroupCount(desc_, &count));
+    CUDNNXX_DNN_CHECK(cudnnGetConvolutionGroupCount(desc_, &count));
     return count;
   }
 
   void SetMathType(cudnnMathType_t math_type) {
-    CUXX_DNN_CHECK(cudnnSetConvolutionMathType(desc_, math_type));
+    CUDNNXX_DNN_CHECK(cudnnSetConvolutionMathType(desc_, math_type));
   }
 
   cudnnMathType_t GetMathType() const {
     cudnnMathType_t type;
-    CUXX_DNN_CHECK(cudnnGetConvolutionMathType(desc_, &type));
+    CUDNNXX_DNN_CHECK(cudnnGetConvolutionMathType(desc_, &type));
     return type;
   }
 
   static int GetForwardAlgorithmMaxCount(const Handle& handle) {
     int count = 0;
-    CUXX_DNN_CHECK(cudnnGetConvolutionForwardAlgorithmMaxCount(
+    CUDNNXX_DNN_CHECK(cudnnGetConvolutionForwardAlgorithmMaxCount(
         handle.raw_handle(), &count));
     return count;
   }
@@ -75,7 +73,7 @@ class Convolution {
                            const int requested_algo_count,
                            int *returned_algo_count,
                            cudnnConvolutionFwdAlgoPerf_t *results) const {
-    CUXX_DNN_CHECK(cudnnGetConvolutionForwardAlgorithm_v7(handle.raw_handle(),
+    CUDNNXX_DNN_CHECK(cudnnGetConvolutionForwardAlgorithm_v7(handle.raw_handle(),
                                                           x.desc(), w.desc(),
                                                           desc_, y.desc(),
                                                           requested_algo_count,
@@ -88,7 +86,7 @@ class Convolution {
                                  const Tensor<TensorT>& y,
                                  cudnnConvolutionFwdAlgo_t algo) const {
     size_t size = 0;
-    CUXX_DNN_CHECK(cudnnGetConvolutionForwardWorkspaceSize(handle.raw_handle(),
+    CUDNNXX_DNN_CHECK(cudnnGetConvolutionForwardWorkspaceSize(handle.raw_handle(),
                                                            x.desc(), w.desc(),
                                                            desc_, y.desc(),
                                                            algo, &size));
@@ -102,7 +100,7 @@ class Convolution {
                             cudnnConvolutionFwdAlgoPerf_t* results,
                             void* workspace,
                             size_t workspace_size_in_bytes) const {
-    CUXX_DNN_CHECK(cudnnFindConvolutionForwardAlgorithmEx(handle.raw_handle(),
+    CUDNNXX_DNN_CHECK(cudnnFindConvolutionForwardAlgorithmEx(handle.raw_handle(),
                                                           x.desc(), x.dev_mem(),
                                                           w.desc(), w.dev_mem(),
                                                           desc_,
@@ -116,7 +114,7 @@ class Convolution {
   void Get2dForwardOutputDim(const Tensor<TensorT>& input,
                              const Filter<TensorT>& filter,
                              int* n, int* c, int* h, int* w) const {
-    CUXX_DNN_CHECK(cudnnGetConvolution2dForwardOutputDim(desc_, input.desc(),
+    CUDNNXX_DNN_CHECK(cudnnGetConvolution2dForwardOutputDim(desc_, input.desc(),
                                                          filter.desc(),
                                                          n, c, h, w));
   }
@@ -124,7 +122,7 @@ class Convolution {
   void GetNdForwardOutputDim(const Tensor<TensorT>& input,
                              const Filter<TensorT>& filter,
                              int n_dims, int output_dims[]) const {
-    CUXX_DNN_CHECK(cudnnGetConvolutionNdForwardOutputDim(desc_, input.desc(),
+    CUDNNXX_DNN_CHECK(cudnnGetConvolutionNdForwardOutputDim(desc_, input.desc(),
                                                          filter.desc(), n_dims,
                                                          output_dims));
   }
@@ -133,7 +131,7 @@ class Convolution {
                const Filter<TensorT>& w, cudnnConvolutionFwdAlgo_t algo,
                void* workspace, size_t workspace_size,
                FactorT beta, Tensor<TensorT>* y) const {
-    CUXX_DNN_CHECK(cudnnConvolutionForward(handle.raw_handle(),
+    CUDNNXX_DNN_CHECK(cudnnConvolutionForward(handle.raw_handle(),
                                            &alpha, x.desc(), x.dev_mem(),
                                            w.desc(), w.dev_mem(),
                                            desc_, algo,
@@ -145,7 +143,7 @@ class Convolution {
 
   static int GetBackwardDataAlgorithmMaxCount(const Handle& handle) {
     int count = 0;
-    CUXX_DNN_CHECK(cudnnGetConvolutionBackwardDataAlgorithmMaxCount(
+    CUDNNXX_DNN_CHECK(cudnnGetConvolutionBackwardDataAlgorithmMaxCount(
                        handle.raw_handle(), &count));
     return count;
   }
@@ -155,7 +153,7 @@ class Convolution {
            const Tensor<TensorT>& dy, const Tensor<TensorT>& dx,
            const int requested_algo_count, int *returned_algo_count,
            cudnnConvolutionBwdDataAlgoPerf_t *results) const {
-    CUXX_DNN_CHECK(cudnnGetConvolutionBackwardDataAlgorithm_v7(
+    CUDNNXX_DNN_CHECK(cudnnGetConvolutionBackwardDataAlgorithm_v7(
                        handle.raw_handle(), w.desc(), dy.desc(), desc_,
                        dx.desc(), requested_algo_count, returned_algo_count,
                        results));
@@ -166,7 +164,7 @@ class Convolution {
              const Tensor<TensorT>& dy, const Tensor<TensorT>& dx,
              cudnnConvolutionBwdDataAlgo_t algo) const {
     size_t size = 0;
-    CUXX_DNN_CHECK(cudnnGetConvolutionBackwardDataWorkspaceSize(
+    CUDNNXX_DNN_CHECK(cudnnGetConvolutionBackwardDataWorkspaceSize(
                        handle.raw_handle(), w.desc(), dy.desc(), desc_,
                        dx.desc(), algo, &size));
     return size;
@@ -180,7 +178,7 @@ class Convolution {
                                  cudnnConvolutionBwdDataAlgoPerf_t* results,
                                  void* workspace,
                                  size_t workspace_size_in_bytes) const {
-    CUXX_DNN_CHECK(cudnnFindConvolutionBackwardDataAlgorithmEx(
+    CUDNNXX_DNN_CHECK(cudnnFindConvolutionBackwardDataAlgorithmEx(
                        handle.raw_handle(), w.desc(), w.dev_mem(),
                        dy.desc(), dy.dev_mem(),
                        desc_,
@@ -194,7 +192,7 @@ class Convolution {
                     cudnnConvolutionBwdDataAlgo_t algo,
                     void* workspace, size_t workspace_size,
                     FactorT beta, Tensor<TensorT>* dx) const {
-    CUXX_DNN_CHECK(cudnnConvolutionBackwardData(handle.raw_handle(),
+    CUDNNXX_DNN_CHECK(cudnnConvolutionBackwardData(handle.raw_handle(),
                                                 &alpha, w.desc(), w.dev_mem(),
                                                 dy.desc(), dy.dev_mem(),
                                                 desc_, algo,
@@ -205,7 +203,7 @@ class Convolution {
 
   static int GetBackwardFilterAlgorithmMaxCount(const Handle& handle) {
     int count = 0;
-    CUXX_DNN_CHECK(cudnnGetConvolutionBackwardFilterAlgorithmMaxCount(
+    CUDNNXX_DNN_CHECK(cudnnGetConvolutionBackwardFilterAlgorithmMaxCount(
                        handle.raw_handle(), &count));
     return count;
   }
@@ -215,7 +213,7 @@ class Convolution {
            const Tensor<TensorT>& dy, const Filter<TensorT>& dw,
            const int requested_algo_count, int *returned_algo_count,
            cudnnConvolutionBwdFilterAlgoPerf_t *results) const {
-    CUXX_DNN_CHECK(cudnnGetConvolutionBackwardFilterAlgorithm_v7(
+    CUDNNXX_DNN_CHECK(cudnnGetConvolutionBackwardFilterAlgorithm_v7(
                        handle.raw_handle(), x.desc(), dy.desc(), desc_,
                        dw.desc(), requested_algo_count, returned_algo_count,
                        results));
@@ -226,7 +224,7 @@ class Convolution {
              const Tensor<TensorT>& dy, const Filter<TensorT>& dw,
              cudnnConvolutionBwdFilterAlgo_t algo) const {
     size_t size = 0;
-    CUXX_DNN_CHECK(cudnnGetConvolutionBackwardFilterWorkspaceSize(
+    CUDNNXX_DNN_CHECK(cudnnGetConvolutionBackwardFilterWorkspaceSize(
                        handle.raw_handle(), x.desc(), dy.desc(), desc_,
                        dw.desc(), algo, &size));
     return size;
@@ -241,7 +239,7 @@ class Convolution {
                                    cudnnConvolutionBwdFilterAlgoPerf_t* results,
                                    void* workspace,
                                    size_t workspace_size_in_bytes) const {
-    CUXX_DNN_CHECK(cudnnFindConvolutionBackwardFilterAlgorithmEx(
+    CUDNNXX_DNN_CHECK(cudnnFindConvolutionBackwardFilterAlgorithmEx(
                        handle.raw_handle(), x.desc(), x.dev_mem(),
                        dy.desc(), dy.dev_mem(),
                        desc_,
@@ -255,7 +253,7 @@ class Convolution {
                       cudnnConvolutionBwdFilterAlgo_t algo,
                       void* workspace, size_t workspace_size,
                       FactorT beta, Filter<TensorT>* dw) const {
-      CUXX_DNN_CHECK(cudnnConvolutionBackwardFilter(handle.raw_handle(),
+      CUDNNXX_DNN_CHECK(cudnnConvolutionBackwardFilter(handle.raw_handle(),
                                                     &alpha,
                                                     x.desc(), x.dev_mem(),
                                                     dy.desc(), dy.dev_mem(),
@@ -271,7 +269,6 @@ class Convolution {
   cudnnConvolutionDescriptor_t desc_;
 };
 
-}  // namespace dnn
-}  // namespace cuxx
+}  // namespace cudnnxx
 
-#endif  // CUXX_DNN_CONVOLUTION_H_
+#endif  // CUDNNXX_CONVOLUTION_H_

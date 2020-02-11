@@ -1,13 +1,11 @@
-#ifndef CUXX_DNN_REDUCE_TENSOR_H_
-#define CUXX_DNN_REDUCE_TENSOR_H_
+#ifndef CUDNNXX_REDUCE_TENSOR_H_
+#define CUDNNXX_REDUCE_TENSOR_H_
 
 #include "cudnn.h"
-#include "cuxx/util.h"
+#include "cudnnxx/common.h"
+#include "cudnnxx/util.h"
 
-#include "cuxx/dnn/common.h"
-
-namespace cuxx {
-namespace dnn {
+namespace cudnnxx {
 
 // FactorT must be float or double.
 template<typename TensorT, typename FactorT>
@@ -17,14 +15,14 @@ class ReduceTensor {
                cudnnNanPropagation_t nan_opt,
                cudnnReduceTensorIndices_t reduces_indices,
                cudnnIndicesType_t indices_type) {
-    CUXX_DNN_CHECK(cudnnCreateReduceTensorDescriptor(&desc_));
-    CUXX_DNN_CHECK(cudnnSetReduceTensorDescriptor(desc_, op, dtype, nan_opt,
+    CUDNNXX_DNN_CHECK(cudnnCreateReduceTensorDescriptor(&desc_));
+    CUDNNXX_DNN_CHECK(cudnnSetReduceTensorDescriptor(desc_, op, dtype, nan_opt,
                                                   reduces_indices,
                                                   indices_type));
   }
 
   ~ReduceTensor() {
-    CUXX_DNN_CHECK(cudnnDestroyReduceTensorDescriptor(desc_));
+    CUDNNXX_DNN_CHECK(cudnnDestroyReduceTensorDescriptor(desc_));
   }
 
   ReduceTensor(const ReduceTensor&) = delete;
@@ -37,7 +35,7 @@ class ReduceTensor {
                void* workspace, size_t workspace_size_in_bytes,
                FactorT alpha, const Tensor<TensorT>& a,
                FactorT beta, Tensor<TensorT>* c) const {
-    CUXX_DNN_CHECK(cudnnReduceTensor(handle.raw_handle(), desc_,
+    CUDNNXX_DNN_CHECK(cudnnReduceTensor(handle.raw_handle(), desc_,
                                      indices, indices_size_in_bytes,
                                      workspace, workspace_size_in_bytes,
                                      &alpha, a.desc(), a.dev_mem(),
@@ -48,7 +46,6 @@ class ReduceTensor {
   cudnnReduceTensorDescriptor_t desc_;
 };
 
-}  // namespace dnn
-}  // namespace cuxx
+}  // namespace cudnnxx
 
-#endif  // CUXX_DNN_REDUCE_TENSOR_H_
+#endif  // CUDNNXX_REDUCE_TENSOR_H_

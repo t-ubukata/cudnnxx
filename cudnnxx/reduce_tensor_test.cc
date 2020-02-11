@@ -1,10 +1,9 @@
 #include <vector>
 
 #include "gtest/gtest.h"
-#include "cuxx/dnn/reduce_tensor.h"
+#include "cudnnxx/reduce_tensor.h"
 
-namespace cuxx {
-namespace dnn {
+namespace cudnnxx {
 
 class ReduceTensorTest : public ::testing::Test {
  protected:
@@ -30,14 +29,14 @@ TEST_F(ReduceTensorTest, TestCompute) {
                           1.3, 1.4, 1.5, 1.6, 1.7, 1.8,
                           1.9, 2.0, 2.1, 2.2, 2.3, 2.4};
   float* a_dev;
-  CUXX_CUDA_CHECK(cudaMalloc(&a_dev, size));
-  CUXX_CUDA_CHECK(cudaMemcpy(a_dev, a_host, size, cudaMemcpyHostToDevice));
+  CUDNNXX_CUDA_CHECK(cudaMalloc(&a_dev, size));
+  CUDNNXX_CUDA_CHECK(cudaMemcpy(a_dev, a_host, size, cudaMemcpyHostToDevice));
   Tensor<float> a_tensor(CUDNN_DATA_FLOAT, CUDNN_TENSOR_NCHW, n, c, h, w,
                          a_dev);
 
   float* c_dev;
   size_t c_dev_size = sizeof(float);
-  CUXX_CUDA_CHECK(cudaMalloc(&c_dev, c_dev_size));
+  CUDNNXX_CUDA_CHECK(cudaMalloc(&c_dev, c_dev_size));
   Tensor<float> c_tensor(CUDNN_DATA_FLOAT, CUDNN_TENSOR_NCHW, 1, 1, 1, 1,
                          c_dev);
 
@@ -46,41 +45,40 @@ TEST_F(ReduceTensorTest, TestCompute) {
       CUDNN_REDUCE_TENSOR_FLATTENED_INDICES, CUDNN_32BIT_INDICES);
 
   size_t indices_size_in_bytes = 0;
-  CUXX_DNN_CHECK(cudnnGetReductionIndicesSize(handle.raw_handle(),
+  CUDNNXX_DNN_CHECK(cudnnGetReductionIndicesSize(handle.raw_handle(),
                                                 reduce_tensor.desc(),
                                                 a_tensor.desc(),
                                                 c_tensor.desc(),
                                                 &indices_size_in_bytes));
   void* indices_dev;
-  CUXX_CUDA_CHECK(cudaMalloc(&indices_dev, indices_size_in_bytes));
+  CUDNNXX_CUDA_CHECK(cudaMalloc(&indices_dev, indices_size_in_bytes));
 
   size_t workspace_size_in_bytes = 0;
-  CUXX_DNN_CHECK(cudnnGetReductionWorkspaceSize(handle.raw_handle(),
+  CUDNNXX_DNN_CHECK(cudnnGetReductionWorkspaceSize(handle.raw_handle(),
                                                   reduce_tensor.desc(),
                                                   a_tensor.desc(),
                                                   c_tensor.desc(),
                                                   &workspace_size_in_bytes));
   void* workspace;
-  CUXX_CUDA_CHECK(cudaMalloc(&workspace, workspace_size_in_bytes));
+  CUDNNXX_CUDA_CHECK(cudaMalloc(&workspace, workspace_size_in_bytes));
 
   reduce_tensor.Compute(handle, indices_dev, indices_size_in_bytes,
                         workspace, workspace_size_in_bytes, 1, a_tensor,
                         0, &c_tensor);
   uint8_t indices_host = 0;
-  CUXX_CUDA_CHECK(cudaMemcpy(&indices_host, indices_dev,
+  CUDNNXX_CUDA_CHECK(cudaMemcpy(&indices_host, indices_dev,
                              indices_size_in_bytes,
                              cudaMemcpyDeviceToHost));
   float c_host = 0;
-  CUXX_CUDA_CHECK(cudaMemcpy(&c_host, c_dev, c_dev_size,
+  CUDNNXX_CUDA_CHECK(cudaMemcpy(&c_host, c_dev, c_dev_size,
                              cudaMemcpyDeviceToHost));
 
   EXPECT_EQ(23, indices_host);
   EXPECT_NEAR(2.4, c_host, 1e-4);
-  CUXX_CUDA_CHECK(cudaFree(workspace));
-  CUXX_CUDA_CHECK(cudaFree(indices_dev));
-  CUXX_CUDA_CHECK(cudaFree(c_dev));
-  CUXX_CUDA_CHECK(cudaFree(a_dev));
+  CUDNNXX_CUDA_CHECK(cudaFree(workspace));
+  CUDNNXX_CUDA_CHECK(cudaFree(indices_dev));
+  CUDNNXX_CUDA_CHECK(cudaFree(c_dev));
+  CUDNNXX_CUDA_CHECK(cudaFree(a_dev));
 }
 
-}  // namespace dnn
-}  // namespace cuxx
+}  // namespace cudnnxx

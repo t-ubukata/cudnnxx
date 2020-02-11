@@ -1,5 +1,5 @@
-#ifndef CUXX_UTIL_H_
-#define CUXX_UTIL_H_
+#ifndef CUDNNXX_UTIL_H_
+#define CUDNNXX_UTIL_H_
 
 #include <ctime>
 #include <chrono>
@@ -7,7 +7,7 @@
 
 #include "cudnn.h"
 
-#define CUXX_LOG_FATAL(MSG) \
+#define CUDNNXX_LOG_FATAL(MSG) \
   do { \
     const std::chrono::system_clock::time_point tp = \
         std::chrono::system_clock::now(); \
@@ -19,26 +19,26 @@
     abort(); \
   } while (false)
 
-#define CUXX_CUDA_CHECK(EXPR) \
+#define CUDNNXX_CUDA_CHECK(EXPR) \
   do { \
     const auto error = (EXPR); \
     if (error != cudaSuccess) { \
-      CUXX_LOG_FATAL(std::string(cudaGetErrorName(error)) + ": " \
+      CUDNNXX_LOG_FATAL(std::string(cudaGetErrorName(error)) + ": " \
                      + std::string(cudaGetErrorString(error))); \
     } \
   } while (false)
 
-#define CUXX_DNN_CHECK(EXPR) \
+#define CUDNNXX_DNN_CHECK(EXPR) \
   do { \
     const auto stat = (EXPR); \
     if (stat != CUDNN_STATUS_SUCCESS) { \
-      CUXX_LOG_FATAL(cudnnGetErrorString(stat)); \
+      CUDNNXX_LOG_FATAL(cudnnGetErrorString(stat)); \
     } \
   } while (false)
 
-#define CUXX_UNUSED_VAR(VAR) static_cast<void>((VAR));
+#define CUDNNXX_UNUSED_VAR(VAR) static_cast<void>((VAR));
 
-#define CUXX_CHECK(COND, MSG) \
-  do {if (!(COND)) {CUXX_LOG_FATAL((MSG));}} while (false)
+#define CUDNNXX_CHECK(COND, MSG) \
+  do {if (!(COND)) {CUDNNXX_LOG_FATAL((MSG));}} while (false)
 
-#endif  // CUXX_UTIL_H_
+#endif  // CUDNNXX_UTIL_H_

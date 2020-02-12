@@ -24,14 +24,14 @@ class Pooling {
   }
 
   // Nd
-  // Pooling(int array_length, const int pads[], const int filter_strides[],
-  //             const int dilations[],
-  //             cudnnConvolutionMode_t mode, cudnnDataType_t dtype) {
-  //   CUDNNXX_DNN_CHECK(cudnnCreateConvolutionDescriptor(&desc_));
-  //   CUDNNXX_DNN_CHECK(cudnnSetConvolutionNdDescriptor(desc_, array_length, pads,
-  //                                                  filter_strides, dilations,
-  //                                                  mode, dtype));
-  // }
+  Pooling(cudnnPoolingMode_t mode, cudnnNanPropagation_t nan_opt, int n_dims,
+          const int window_dims[], const int paddings[], const int strides[]) {
+    CUDNNXX_DNN_CHECK(cudnnCreatePoolingDescriptor(&desc_));
+    // Note: API reference is wrong.
+    CUDNNXX_DNN_CHECK(cudnnSetPoolingNdDescriptor(desc_, mode, nan_opt, n_dims,
+                                                  window_dims, paddings,
+                                                  strides));
+  }
 
   ~Pooling() {
     CUDNNXX_DNN_CHECK(cudnnDestroyPoolingDescriptor(desc_));

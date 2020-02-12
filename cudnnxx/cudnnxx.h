@@ -12,7 +12,6 @@
 // Op
 //   batch_norm
 //   dropout
-//   pooling
 //   rnn
 //   divisive_normalization
 //   CTCLoss

@@ -253,14 +253,14 @@ class Convolution {
                       cudnnConvolutionBwdFilterAlgo_t algo,
                       void* workspace, size_t workspace_size,
                       FactorT beta, Filter<TensorT>* dw) const {
-      CUDNNXX_DNN_CHECK(cudnnConvolutionBackwardFilter(handle.raw_handle(),
-                                                    &alpha,
-                                                    x.desc(), x.dev_mem(),
-                                                    dy.desc(), dy.dev_mem(),
-                                                    desc_, algo,
-                                                    workspace, workspace_size,
-                                                    &beta,
-                                                    dw->desc(), dw->dev_mem()));
+    CUDNNXX_DNN_CHECK(cudnnConvolutionBackwardFilter(handle.raw_handle(),
+                                                     &alpha,
+                                                     x.desc(), x.dev_mem(),
+                                                     dy.desc(), dy.dev_mem(),
+                                                     desc_, algo,
+                                                     workspace, workspace_size,
+                                                     &beta,
+                                                     dw->desc(), dw->dev_mem()));
   }
 
   // cudnnConvolutionBackwardBias

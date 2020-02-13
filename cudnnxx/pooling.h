@@ -1,6 +1,8 @@
 #ifndef CUDNNXX_POOLING_H_
 #define CUDNNXX_POOLING_H_
 
+#include <array>
+
 #include "cudnn.h"
 #include "cudnnxx/common.h"
 #include "cudnnxx/util.h"
@@ -27,7 +29,7 @@ class Pooling {
   Pooling(cudnnPoolingMode_t mode, cudnnNanPropagation_t nan_opt, int n_dims,
           const int window_dims[], const int paddings[], const int strides[]) {
     CUDNNXX_DNN_CHECK(cudnnCreatePoolingDescriptor(&desc_));
-    // Note: API reference is wrong.
+    // Note: cuDNN API reference is wrong.
     CUDNNXX_DNN_CHECK(cudnnSetPoolingNdDescriptor(desc_, mode, nan_opt, n_dims,
                                                   window_dims, paddings,
                                                   strides));
@@ -42,7 +44,16 @@ class Pooling {
 
   cudnnPoolingDescriptor_t desc() const {return desc_;}
 
-  // Get2dForwardOutputDim
+  std::array<int, 4> Get2dForwardOutputDim(const Tensor<TensorT>& in) {
+    int n = 0;
+    int c = 0;
+    int h = 0;
+    int w = 0;
+    CUDNNXX_DNN_CHECK(cudnnGetPooling2dForwardOutputDim(desc_, in.desc(),
+                                                        &n, &c, &h, &w));
+    return {{n, c, h, w}};
+  }
+
   // GetNdForwardOutputDim
   // Forward
   // Backward

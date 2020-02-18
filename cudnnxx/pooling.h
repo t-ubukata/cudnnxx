@@ -2,6 +2,7 @@
 #define CUDNNXX_POOLING_H_
 
 #include <array>
+#include <vector>
 
 #include "cudnn.h"
 #include "cudnnxx/common.h"
@@ -54,7 +55,15 @@ class Pooling {
     return {{n, c, h, w}};
   }
 
-  // GetNdForwardOutputDim
+  std::vector<int> GetNdForwardOutputDim(const Tensor<TensorT>& in,
+                                         int n_dims) {
+    std::vector<int> out_dims(n_dims);
+    CUDNNXX_DNN_CHECK(cudnnGetPoolingNdForwardOutputDim(desc_, in.desc(),
+                                                        n_dims,
+                                                        out_dims.data()));
+    return out_dims;
+  }
+
   // Forward
   // Backward
 

@@ -64,7 +64,13 @@ class Pooling {
     return out_dims;
   }
 
-  // Forward
+  void Forward(const Handle& handle, FactorT alpha, const Tensor<TensorT>& x,
+               FactorT beta, Tensor<TensorT>* y) {
+    CUDNNXX_DNN_CHECK(cudnnPoolingForward(handle.raw_handle(), desc_,
+                                          &alpha, x.desc(), x.dev_mem(),
+                                          &beta, y->desc(), y->dev_mem()));
+  }
+
   // Backward
 
  private:

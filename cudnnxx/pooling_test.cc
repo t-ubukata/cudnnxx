@@ -94,4 +94,46 @@ TEST_F(PoolingTest, TestGet2dForwardOutputDim) {
 //   CUDNNXX_CUDA_CHECK(cudaFree(x_dev));
 // }
 
+TEST_F(PoolingTest, TestForward) {
+  Pooling<float, float> pool(CUDNN_POOLING_MAX_DETERMINISTIC,
+                             CUDNN_PROPAGATE_NAN, 2, 2, 1, 1, 2, 2);
+  constexpr int x_n = 32;
+  constexpr int x_c = 3;
+  constexpr int x_h = 8;
+  constexpr int x_w = 8;
+  constexpr int n_x_elem = x_n * x_c * x_h * x_w;
+  size_t x_size = sizeof(float) * n_x_elem;
+  float x_host[n_x_elem] = {};
+  for (int i = 0; i < n_x_elem; ++i) {
+    x_host[i] = i * 0.0001;
+  }
+  float* x_dev = nullptr;
+  CUDNNXX_CUDA_CHECK(cudaMalloc(&x_dev, x_size));
+  CUDNNXX_CUDA_CHECK(cudaMemcpy(x_dev, x_host, x_size, cudaMemcpyHostToDevice));
+  Tensor<float> x(CUDNN_DATA_FLOAT, CUDNN_TENSOR_NCHW, x_n, x_c, x_h, x_w,
+                  x_dev);
+  std::array<int, 4> out_dims = pool.Get2dForwardOutputDim(x);
+  Tensor<float> y(CUDNN_DATA_FLOAT, CUDNN_TENSOR_NCHW,
+                  out_dims[0], out_dims[1], out_dims[2], out_dims[3], x_dev);
+  pool.Forward(handle, 1, x, 0, &y);
+  Tensor<float> y_ref(CUDNN_DATA_FLOAT, CUDNN_TENSOR_NCHW,
+                      out_dims[0], out_dims[1], out_dims[2], out_dims[3],
+                      x_dev);
+  float alpha = 1;
+  float beta = 0;
+  CUDNNXX_DNN_CHECK(cudnnPoolingForward(handle.raw_handle(), pool.desc(),
+                                        &alpha, x.desc(), x.dev_mem(),
+                                        &beta, y_ref.desc(), y_ref.dev_mem()));
+  float y_host[n_x_elem] = {};
+  CUDNNXX_CUDA_CHECK(cudaMemcpy(y_host, y.dev_mem(), x_size,
+                                cudaMemcpyDeviceToHost));
+  float y_ref_host[n_x_elem] = {};
+  CUDNNXX_CUDA_CHECK(cudaMemcpy(y_ref_host, y_ref.dev_mem(), x_size,
+                                cudaMemcpyDeviceToHost));
+  for (int i = 0; i < n_x_elem; ++i) {
+    EXPECT_NEAR(y_ref_host[i], y_host[i], 1e-4) << "i: " << i;
+  }
+  CUDNNXX_CUDA_CHECK(cudaFree(x_dev));
+}
+
 }  // namespace cudnnxx

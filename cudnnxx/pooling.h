@@ -71,7 +71,15 @@ class Pooling {
                                           &beta, y->desc(), y->dev_mem()));
   }
 
-  // Backward
+  void Backward(const Handle& handle, FactorT alpha, const Tensor<TensorT>& y,
+                const Tensor<TensorT>& dy, const Tensor<TensorT>& x,
+                FactorT beta, Tensor<TensorT>* dx) {
+    CUDNNXX_DNN_CHECK(cudnnPoolingBackward(handle.raw_handle(), desc_,
+                                           &alpha, y.desc(), y.dev_mem(),
+                                           dy.desc(), dy.dev_mem(),
+                                           x.desc(), x.dev_mem(),
+                                           &beta, dx->desc(), dx->dev_mem()));
+  }
 
  private:
   cudnnPoolingDescriptor_t desc_;

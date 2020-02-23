@@ -1,5 +1,5 @@
-#include "gtest/gtest.h"
 #include "cudnnxx/cudnnxx.h"
+#include "gtest/gtest.h"
 
 namespace cudnnxx {
 
@@ -69,15 +69,12 @@ TEST_F(ExampleTest, TestConvolutionForward2d) {
   CUDNNXX_CUDA_CHECK(cudaMalloc(&y_dev_ref, y_size));
   Tensor<float> y_ref(CUDNN_DATA_FLOAT, CUDNN_TENSOR_NCHW, y_n, y_c, y_h, y_w,
                       y_dev_ref);
-  CUDNNXX_DNN_CHECK(cudnnConvolutionForward(handle.raw_handle(),
-                                         &alpha, x.desc(), x.dev_mem(),
-                                         w.desc(), w.dev_mem(),
-                                         conv.desc(), algo,
-                                         ws, ws_size,
-                                         &beta, y_ref.desc(), y_ref.dev_mem()));
+  CUDNNXX_DNN_CHECK(cudnnConvolutionForward(
+      handle.raw_handle(), &alpha, x.desc(), x.dev_mem(), w.desc(), w.dev_mem(),
+      conv.desc(), algo, ws, ws_size, &beta, y_ref.desc(), y_ref.dev_mem()));
   float y_host_ref[n_y_elem] = {};
-  CUDNNXX_CUDA_CHECK(cudaMemcpy(y_host_ref, y_dev_ref, y_size,
-                             cudaMemcpyDeviceToHost));
+  CUDNNXX_CUDA_CHECK(
+      cudaMemcpy(y_host_ref, y_dev_ref, y_size, cudaMemcpyDeviceToHost));
 
   for (int i = 0; i < n_y_elem; ++i) {
     EXPECT_EQ(y_host_ref[i], y_host[i]) << "Value does not match: " << i;
@@ -106,9 +103,8 @@ TEST_F(ExampleTest, TestcudnnConvolutionForward2d) {
   CUDNNXX_CUDA_CHECK(cudaMemcpy(x_dev, x_host, x_size, cudaMemcpyHostToDevice));
   cudnnTensorDescriptor_t x_desc;
   CUDNNXX_DNN_CHECK(cudnnCreateTensorDescriptor(&x_desc));
-  CUDNNXX_DNN_CHECK(cudnnSetTensor4dDescriptor(x_desc, CUDNN_TENSOR_NCHW,
-                                               CUDNN_DATA_FLOAT,
-                                               x_n, x_c, x_h, x_w));
+  CUDNNXX_DNN_CHECK(cudnnSetTensor4dDescriptor(
+      x_desc, CUDNN_TENSOR_NCHW, CUDNN_DATA_FLOAT, x_n, x_c, x_h, x_w));
 
   constexpr int w_k = 4;  // The number of output feature maps.
   constexpr int w_c = 3;  // The number of input feature maps.
@@ -128,9 +124,8 @@ TEST_F(ExampleTest, TestcudnnConvolutionForward2d) {
 
   cudnnFilterDescriptor_t w_desc;
   CUDNNXX_DNN_CHECK(cudnnCreateFilterDescriptor(&w_desc));
-  CUDNNXX_DNN_CHECK(cudnnSetFilter4dDescriptor(w_desc, CUDNN_DATA_FLOAT,
-                                               CUDNN_TENSOR_NCHW,
-                                               w_k, w_c, w_h, w_w));
+  CUDNNXX_DNN_CHECK(cudnnSetFilter4dDescriptor(
+      w_desc, CUDNN_DATA_FLOAT, CUDNN_TENSOR_NCHW, w_k, w_c, w_h, w_w));
 
   constexpr int y_n = 32;
   constexpr int y_c = 4;
@@ -142,35 +137,28 @@ TEST_F(ExampleTest, TestcudnnConvolutionForward2d) {
   CUDNNXX_CUDA_CHECK(cudaMalloc(&y_dev, y_size));
   cudnnTensorDescriptor_t y_desc;
   CUDNNXX_DNN_CHECK(cudnnCreateTensorDescriptor(&y_desc));
-  CUDNNXX_DNN_CHECK(cudnnSetTensor4dDescriptor(y_desc, CUDNN_TENSOR_NCHW,
-                                               CUDNN_DATA_FLOAT,
-                                               y_n, y_c, y_h, y_w));
+  CUDNNXX_DNN_CHECK(cudnnSetTensor4dDescriptor(
+      y_desc, CUDNN_TENSOR_NCHW, CUDNN_DATA_FLOAT, y_n, y_c, y_h, y_w));
 
   cudnnConvolutionDescriptor_t conv_desc;
   CUDNNXX_DNN_CHECK(cudnnCreateConvolutionDescriptor(&conv_desc));
-  CUDNNXX_DNN_CHECK(cudnnSetConvolution2dDescriptor(conv_desc, 0, 0, 1, 2, 1, 1,
-                                                    CUDNN_CONVOLUTION,
-                                                    CUDNN_DATA_FLOAT));
+  CUDNNXX_DNN_CHECK(cudnnSetConvolution2dDescriptor(
+      conv_desc, 0, 0, 1, 2, 1, 1, CUDNN_CONVOLUTION, CUDNN_DATA_FLOAT));
   cudnnHandle_t raw_handle;
   CUDNNXX_DNN_CHECK(cudnnCreate(&raw_handle));
 
   auto algo = CUDNN_CONVOLUTION_FWD_ALGO_GEMM;
   size_t ws_size = 0;
-  CUDNNXX_DNN_CHECK(cudnnGetConvolutionForwardWorkspaceSize(raw_handle,
-                                                            x_desc, w_desc,
-                                                            conv_desc, y_desc,
-                                                            algo, &ws_size));
+  CUDNNXX_DNN_CHECK(cudnnGetConvolutionForwardWorkspaceSize(
+      raw_handle, x_desc, w_desc, conv_desc, y_desc, algo, &ws_size));
   void* ws = nullptr;
   CUDNNXX_CUDA_CHECK(cudaMalloc(&ws, ws_size));
 
   constexpr float alpha = 1;
   constexpr float beta = 0;
-  CUDNNXX_DNN_CHECK(cudnnConvolutionForward(raw_handle,
-                                            &alpha, x_desc, x_dev,
-                                            w_desc, w_dev,
-                                            conv_desc, algo,
-                                            ws, ws_size,
-                                            &beta, y_desc, y_dev));
+  CUDNNXX_DNN_CHECK(cudnnConvolutionForward(raw_handle, &alpha, x_desc, x_dev,
+                                            w_desc, w_dev, conv_desc, algo, ws,
+                                            ws_size, &beta, y_desc, y_dev));
 
   float y_host[n_y_elem] = {};
   CUDNNXX_CUDA_CHECK(cudaMemcpy(y_host, y_dev, y_size, cudaMemcpyDeviceToHost));

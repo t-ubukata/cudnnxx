@@ -1,44 +1,49 @@
 #ifndef CUDNNXX_UTIL_H_
 #define CUDNNXX_UTIL_H_
 
-#include <ctime>
 #include <chrono>
+#include <ctime>
 #include <iostream>
 
 #include "cudnn.h"
 
-#define CUDNNXX_LOG_FATAL(MSG) \
-  do { \
-    const std::chrono::system_clock::time_point tp = \
-        std::chrono::system_clock::now(); \
-    const std::time_t tt = std::chrono::system_clock::to_time_t(tp); \
-    char time_str[20]; \
+#define CUDNNXX_LOG_FATAL(MSG)                                               \
+  do {                                                                       \
+    const std::chrono::system_clock::time_point tp =                         \
+        std::chrono::system_clock::now();                                    \
+    const std::time_t tt = std::chrono::system_clock::to_time_t(tp);         \
+    char time_str[20];                                                       \
     std::strftime(time_str, sizeof(time_str), "%F %T", std::localtime(&tt)); \
-    std::cerr << time_str << ":" << " F " <<  __FILE__ << ":" << \
-    __LINE__ << "] " << (MSG) << std::endl; \
-    abort(); \
+    std::cerr << time_str << ":"                                             \
+              << " F " << __FILE__ << ":" << __LINE__ << "] " << (MSG)       \
+              << std::endl;                                                  \
+    abort();                                                                 \
   } while (false)
 
-#define CUDNNXX_CUDA_CHECK(EXPR) \
-  do { \
-    const auto error = (EXPR); \
-    if (error != cudaSuccess) { \
-      CUDNNXX_LOG_FATAL(std::string(cudaGetErrorName(error)) + ": " \
-                     + std::string(cudaGetErrorString(error))); \
-    } \
+#define CUDNNXX_CUDA_CHECK(EXPR)                                      \
+  do {                                                                \
+    const auto error = (EXPR);                                        \
+    if (error != cudaSuccess) {                                       \
+      CUDNNXX_LOG_FATAL(std::string(cudaGetErrorName(error)) + ": " + \
+                        std::string(cudaGetErrorString(error)));      \
+    }                                                                 \
   } while (false)
 
-#define CUDNNXX_DNN_CHECK(EXPR) \
-  do { \
-    const auto stat = (EXPR); \
-    if (stat != CUDNN_STATUS_SUCCESS) { \
+#define CUDNNXX_DNN_CHECK(EXPR)                     \
+  do {                                              \
+    const auto stat = (EXPR);                       \
+    if (stat != CUDNN_STATUS_SUCCESS) {             \
       CUDNNXX_LOG_FATAL(cudnnGetErrorString(stat)); \
-    } \
+    }                                               \
   } while (false)
 
 #define CUDNNXX_UNUSED_VAR(VAR) static_cast<void>((VAR));
 
 #define CUDNNXX_CHECK(COND, MSG) \
-  do {if (!(COND)) {CUDNNXX_LOG_FATAL((MSG));}} while (false)
+  do {                           \
+    if (!(COND)) {               \
+      CUDNNXX_LOG_FATAL((MSG));  \
+    }                            \
+  } while (false)
 
 #endif  // CUDNNXX_UTIL_H_

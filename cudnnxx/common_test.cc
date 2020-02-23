@@ -1,13 +1,11 @@
-#include "gtest/gtest.h"
 #include "cudnnxx/common.h"
+#include "gtest/gtest.h"
 
 namespace cudnnxx {
 
 class HandleTest : public ::testing::Test {};
 
-TEST_F(HandleTest, TestConstructor) {
-  Handle handle;
-}
+TEST_F(HandleTest, TestConstructor) { Handle handle; }
 
 TEST_F(HandleTest, TestRawHandle) {
   Handle handle;
@@ -27,7 +25,8 @@ TEST_F(TensorTest, TestConstructor4d) {
   float* mem_dev = nullptr;
   size_t size = sizeof(float) * n_elem;
   CUDNNXX_CUDA_CHECK(cudaMalloc(&mem_dev, size));
-  CUDNNXX_CUDA_CHECK(cudaMemcpy(mem_dev, mem_host, size, cudaMemcpyHostToDevice));
+  CUDNNXX_CUDA_CHECK(
+      cudaMemcpy(mem_dev, mem_host, size, cudaMemcpyHostToDevice));
   Tensor<float> t(CUDNN_DATA_FLOAT, CUDNN_TENSOR_NCHW, n, c, h, w, mem_dev);
   CUDNNXX_CUDA_CHECK(cudaFree(mem_dev));
 }
@@ -42,14 +41,15 @@ TEST_F(TensorTest, TestConstructor4dEx) {
   float* mem_dev = nullptr;
   size_t size = sizeof(float) * n_elem;
   CUDNNXX_CUDA_CHECK(cudaMalloc(&mem_dev, size));
-  CUDNNXX_CUDA_CHECK(cudaMemcpy(mem_dev, mem_host, size, cudaMemcpyHostToDevice));
+  CUDNNXX_CUDA_CHECK(
+      cudaMemcpy(mem_dev, mem_host, size, cudaMemcpyHostToDevice));
   // NHWC
   int n_stride = 12;
   int c_stride = 1;
   int h_stride = 6;
   int w_stride = 3;
-  Tensor<float> t(CUDNN_DATA_FLOAT, n, c, h, w,
-                  n_stride, c_stride, h_stride, w_stride, mem_dev);
+  Tensor<float> t(CUDNN_DATA_FLOAT, n, c, h, w, n_stride, c_stride, h_stride,
+                  w_stride, mem_dev);
   CUDNNXX_CUDA_CHECK(cudaFree(mem_dev));
 }
 
@@ -63,7 +63,8 @@ TEST_F(TensorTest, TestConstructorNd) {
   float* mem_dev = nullptr;
   size_t size = sizeof(float) * n_elem;
   CUDNNXX_CUDA_CHECK(cudaMalloc(&mem_dev, size));
-  CUDNNXX_CUDA_CHECK(cudaMemcpy(mem_dev, mem_host, size, cudaMemcpyHostToDevice));
+  CUDNNXX_CUDA_CHECK(
+      cudaMemcpy(mem_dev, mem_host, size, cudaMemcpyHostToDevice));
   // HWN
   int dims[n_dims] = {n, h, w};
   int strides[n_dims] = {1, 8, 4};
@@ -82,7 +83,8 @@ TEST_F(TensorTest, TestConstructorNdEx) {
   float* mem_dev = nullptr;
   size_t size = sizeof(float) * n_elem;
   CUDNNXX_CUDA_CHECK(cudaMalloc(&mem_dev, size));
-  CUDNNXX_CUDA_CHECK(cudaMemcpy(mem_dev, mem_host, size, cudaMemcpyHostToDevice));
+  CUDNNXX_CUDA_CHECK(
+      cudaMemcpy(mem_dev, mem_host, size, cudaMemcpyHostToDevice));
   int dims[n_dims] = {n, c, h, w};
   Tensor<float> t(CUDNN_TENSOR_NCHW, CUDNN_DATA_FLOAT, n_dims, dims, mem_dev);
   CUDNNXX_CUDA_CHECK(cudaFree(mem_dev));
@@ -100,7 +102,8 @@ TEST_F(FilterTest, TestConstructor4d) {
   float* mem_dev = nullptr;
   size_t size = sizeof(float) * n_elem;
   CUDNNXX_CUDA_CHECK(cudaMalloc(&mem_dev, size));
-  CUDNNXX_CUDA_CHECK(cudaMemcpy(mem_dev, mem_host, size, cudaMemcpyHostToDevice));
+  CUDNNXX_CUDA_CHECK(
+      cudaMemcpy(mem_dev, mem_host, size, cudaMemcpyHostToDevice));
   Filter<float> f(CUDNN_DATA_FLOAT, CUDNN_TENSOR_NCHW, k, c, h, w, mem_dev);
   CUDNNXX_CUDA_CHECK(cudaFree(mem_dev));
 }
@@ -115,7 +118,8 @@ TEST_F(FilterTest, TestConstructorNd) {
   float* mem_dev = nullptr;
   size_t size = sizeof(float) * n_elem;
   CUDNNXX_CUDA_CHECK(cudaMalloc(&mem_dev, size));
-  CUDNNXX_CUDA_CHECK(cudaMemcpy(mem_dev, mem_host, size, cudaMemcpyHostToDevice));
+  CUDNNXX_CUDA_CHECK(
+      cudaMemcpy(mem_dev, mem_host, size, cudaMemcpyHostToDevice));
   constexpr int n_dims = 4;
   int dims[n_dims] = {k, c, r, s};
   Filter<float> f(CUDNN_DATA_FLOAT, CUDNN_TENSOR_NCHW, n_dims, dims, mem_dev);

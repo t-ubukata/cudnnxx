@@ -31,7 +31,7 @@ $(OBJ_DIR)/reduce_tensor.o: $(SRC_DIR)/reduce_tensor.cc
 $(OBJ_DIR)/pooling.o: $(SRC_DIR)/pooling.cc
 	$(CXX) $(CXXFLAGS) $^ -c -o $@
 
-.PHONY: test clean
+.PHONY: test format clean
 
 TEST_BIN_DIR := ./test_bin
 
@@ -74,6 +74,9 @@ $(OBJ_DIR)/pooling_test.o: $(SRC_DIR)/pooling_test.cc
 	$(CXX) $(CXXFLAGS) $^ -c -o $@
 $(OBJ_DIR)/example_test.o: $(SRC_DIR)/example_test.cc $(TARGET_LIB)
 	$(CXX) $(CXXFLAGS) $(SRC_DIR)/example_test.cc -c -o $@
+
+format:
+	clang-format -i -style="{BasedOnStyle: Google}" cudnnxx/*
 
 clean:
 	$(RM) $(OBJ_DIR)/* $(TARGET_LIB) $(TEST_BIN_DIR)/* \

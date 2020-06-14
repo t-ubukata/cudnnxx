@@ -1,1 +1,0 @@
-#include "cudnnxx/activation.h"

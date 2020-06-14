@@ -5,31 +5,10 @@ GTEST_DIR := ./external/googletest
 CXXFLAGS := -g -std=c++11 -Wall -Wextra -Werror -pedantic -pedantic-errors \
             -fno-exceptions -fPIC -I. \
             -I$(CUDA_DIR)/include -I$(GTEST_DIR)/googletest/include
-TARGET_LIB := ./lib/libcuxx.so
 OBJ_DIR := ./obj
-OBJS := $(OBJ_DIR)/common.o $(OBJ_DIR)/op_tensor.o $(OBJ_DIR)/convolution.o
 LDFLAGS := -L$(CUDA_DIR)/lib64 -lpthread -lcuda -lcudart -lcudnn
 
-# The target lib.
-$(TARGET_LIB): $(OBJS)
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) -shared $^ -o $@
-
 SRC_DIR := ./cudnnxx
-
-# Object files.
-
-$(OBJ_DIR)/common.o: $(SRC_DIR)/common.cc
-	$(CXX) $(CXXFLAGS) $^ -c -o $@
-$(OBJ_DIR)/op_tensor.o: $(SRC_DIR)/op_tensor.cc
-	$(CXX) $(CXXFLAGS) $^ -c -o $@
-$(OBJ_DIR)/convolution.o: $(SRC_DIR)/convolution.cc
-	$(CXX) $(CXXFLAGS) $^ -c -o $@
-$(OBJ_DIR)/activation.o: $(SRC_DIR)/activation.cc
-	$(CXX) $(CXXFLAGS) $^ -c -o $@
-$(OBJ_DIR)/reduce_tensor.o: $(SRC_DIR)/reduce_tensor.cc
-	$(CXX) $(CXXFLAGS) $^ -c -o $@
-$(OBJ_DIR)/pooling.o: $(SRC_DIR)/pooling.cc
-	$(CXX) $(CXXFLAGS) $^ -c -o $@
 
 .PHONY: test format clean
 

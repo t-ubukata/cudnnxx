@@ -10,18 +10,12 @@
 
 // TODO(t-ubukata):
 // Op
-//   batch_norm
-//   dropout
-//   rnn
 //   divisive_normalization
 //   CTCLoss
 //   Algorithm
 //   AlgorithmPerformance
 //   SpatialTransformer
 //
-// Improve build.
-// Mutex.
-// Consider about copy constructors and move constructors.
-// Consider about mutation.
+// Consider about mutex, copy, move, and mutation.
 
 #endif  // CUDNNXX_CUDNNXX_H_

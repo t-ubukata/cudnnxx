@@ -21,3 +21,8 @@ cuDNN C++ wrapper.
 ```
 make
 ```
+
+## Usage
+
+Include cudnnxx/cudnnxx.h.
+See cudnnxx/example_test.cc for more information.

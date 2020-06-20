@@ -16,8 +16,8 @@ class RNN {
       cudnnRNNMode_t mode, cudnnRNNAlgo_t algo, cudnnDataType_t dtype) {
     CUDNNXX_DNN_CHECK(cudnnCreateRNNDescriptor(&desc_));
     CUDNNXX_DNN_CHECK(cudnnSetRNNDescriptor_v6(handle.raw_handle(), desc_,
-                      dropout.desc(), input_mode, direction, mode, algo,
-                      dtype));
+                                               dropout.desc(), input_mode,
+                                               direction, mode, algo, dtype));
   }
 
   ~RNN() { CUDNNXX_DNN_CHECK(cudnnDestroyRNNDescriptor(desc_)); }
@@ -29,17 +29,20 @@ class RNN {
 
   // void Forward(const Handle& handle, FactorT alpha, const Tensor<TensorT>& x,
   //              FactorT beta, Tensor<TensorT>* y) {
-  //   CUDNNXX_DNN_CHECK(cudnnActivationForward(handle.raw_handle(), desc_, &alpha,
+  //   CUDNNXX_DNN_CHECK(cudnnActivationForward(handle.raw_handle(), desc_,
+  //   &alpha,
   //                                            x.desc(), x.dev_mem(), &beta,
   //                                            y->desc(), y->dev_mem()));
   // }
   //
-  // void Backward(const Handle& handle, FactorT alpha, const Tensor<TensorT>& y,
+  // void Backward(const Handle& handle, FactorT alpha, const Tensor<TensorT>&
+  // y,
   //               const Tensor<TensorT>& dy, const Tensor<TensorT>& x,
   //               FactorT beta, const Tensor<TensorT>* dx) {
   //   CUDNNXX_DNN_CHECK(cudnnActivationBackward(
   //       handle.raw_handle(), desc_, &alpha, y.desc(), y.dev_mem(), dy.desc(),
-  //       dy.dev_mem(), x.desc(), x.dev_mem(), &beta, dx->desc(), dx->dev_mem()));
+  //       dy.dev_mem(), x.desc(), x.dev_mem(), &beta, dx->desc(),
+  //       dx->dev_mem()));
   // }
 
  private:

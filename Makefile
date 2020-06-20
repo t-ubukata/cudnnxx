@@ -1,9 +1,10 @@
 CC := clang
 CXX := clang++
+
 CUDA_DIR := /usr/local/cuda
 GTEST_DIR := ./external/googletest
 CXXFLAGS := -g -std=c++11 -Wall -Wextra -Werror -pedantic -pedantic-errors \
-            -fno-exceptions -fPIC -I. \
+            -fno-exceptions -I. \
             -I$(CUDA_DIR)/include -I$(GTEST_DIR)/googletest/include
 OBJ_DIR := ./obj
 LDFLAGS := -L$(CUDA_DIR)/lib64 -lpthread -lcuda -lcudart -lcudnn
@@ -24,6 +25,7 @@ TEST_OBJS := $(OBJ_DIR)/common_test.o \
              $(OBJ_DIR)/activation_test.o \
              $(OBJ_DIR)/reduce_tensor_test.o \
              $(OBJ_DIR)/pooling_test.o \
+             $(OBJ_DIR)/dropout_test.o \
              $(OBJ_DIR)/example_test.o
 
 
@@ -51,11 +53,13 @@ $(OBJ_DIR)/reduce_tensor_test.o: $(SRC_DIR)/reduce_tensor_test.cc
 	$(CXX) $(CXXFLAGS) $^ -c -o $@
 $(OBJ_DIR)/pooling_test.o: $(SRC_DIR)/pooling_test.cc
 	$(CXX) $(CXXFLAGS) $^ -c -o $@
-$(OBJ_DIR)/example_test.o: $(SRC_DIR)/example_test.cc $(TARGET_LIB)
-	$(CXX) $(CXXFLAGS) $(SRC_DIR)/example_test.cc -c -o $@
+$(OBJ_DIR)/dropout_test.o: $(SRC_DIR)/dropout_test.cc
+	$(CXX) $(CXXFLAGS) $^ -c -o $@
+$(OBJ_DIR)/example_test.o: $(SRC_DIR)/example_test.cc
+	$(CXX) $(CXXFLAGS) $^ -c -o $@
 
 format:
-	clang-format -i -style="{BasedOnStyle: Google}" cudnnxx/*
+	clang-format -i -style=Google cudnnxx/*
 
 clean:
 	$(RM) $(OBJ_DIR)/* $(TARGET_LIB) $(TEST_BIN_DIR)/* \

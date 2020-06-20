@@ -30,7 +30,7 @@
 *.exe
 *.out
 *.app
-test_bin/*
+test_bin/gtest_main
 
 # GoogleTest files
 external/googlltest/.git

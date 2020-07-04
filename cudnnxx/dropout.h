@@ -12,18 +12,18 @@ class Dropout {
  public:
   Dropout(const Handle& handle, float dropout, unsigned long long seed) {
     CUDNNXX_DNN_CHECK(cudnnCreateDropoutDescriptor(&desc_));
-    size_t states_size_in_bytes;
+    size_t states_size_in_bytes = 0;
     CUDNNXX_DNN_CHECK(
         cudnnDropoutGetStatesSize(handle.raw_handle(), &states_size_in_bytes));
-    CUDNNXX_CUDA_CHECK(cudaMalloc(&states, states_size_in_bytes));
+    CUDNNXX_CUDA_CHECK(cudaMalloc(&states_, states_size_in_bytes));
     CUDNNXX_DNN_CHECK(cudnnSetDropoutDescriptor(desc_, handle.raw_handle(),
-                                                dropout, states,
+                                                dropout, states_,
                                                 states_size_in_bytes, seed));
   }
 
   ~Dropout() {
     CUDNNXX_DNN_CHECK(cudnnDestroyDropoutDescriptor(desc_));
-    CUDNNXX_CUDA_CHECK(cudaFree(states));
+    CUDNNXX_CUDA_CHECK(cudaFree(states_));
   }
 
   Dropout(const Dropout&) = delete;
@@ -34,10 +34,12 @@ class Dropout {
   void Forward(const Handle& handle, const Tensor<TensorT>& x,
                Tensor<TensorT>* y) {
     CUDNNXX_DNN_CHECK(cudnnDropoutGetReserveSpaceSize(
-        x.desc(), &reserve_space_size_in_bytes));
+        x.desc(), &reserve_space_size_in_bytes_));
+    CUDNNXX_CUDA_CHECK(cudaMalloc(&reserve_space_,
+                                  reserve_space_size_in_bytes_));
     CUDNNXX_DNN_CHECK(cudnnDropoutForward(
         handle.raw_handle(), desc_, x.desc(), x.dev_mem(), y->desc(),
-        y->dev_mem(), reserve_space, reserve_space_size_in_bytes));
+        y->dev_mem(), reserve_space_, reserve_space_size_in_bytes_));
   }
 
   // void Backward(const Handle& handle, FactorT alpha, const Tensor<TensorT>&
@@ -48,13 +50,15 @@ class Dropout {
   //       handle.raw_handle(), desc_, &alpha, y.desc(), y.dev_mem(), dy.desc(),
   //       dy.dev_mem(), x.desc(), x.dev_mem(), &beta, dx->desc(),
   //       dx->dev_mem()));
+
+  // free
   // }
 
  private:
-  void* states;
+  void* states_ = nullptr;
   cudnnDropoutDescriptor_t desc_;
-  void* reserve_space;
-  size_t reserve_space_size_in_bytes;
+  void* reserve_space_ = nullptr;
+  size_t reserve_space_size_in_bytes_ = 0;
 };
 
 }  // namespace cudnnxx

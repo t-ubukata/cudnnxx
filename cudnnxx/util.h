@@ -14,9 +14,8 @@
     const std::time_t tt = std::chrono::system_clock::to_time_t(tp);         \
     char time_str[20];                                                       \
     std::strftime(time_str, sizeof(time_str), "%F %T", std::localtime(&tt)); \
-    std::cerr << time_str << ": "                                             \
-              << #LEVEL_CHAR << " " << __FILE__ << ":" << __LINE__ << "] "       \
-              << (MSG) << "\n";                                              \
+    std::cerr << time_str << ": " << #LEVEL_CHAR << " " << __FILE__ << ":"   \
+              << __LINE__ << "] " << (MSG) << "\n";                          \
   } while (false)
 
 #define CUDNNXX_LOG_INFO(MSG) CUDNNXX_LOG(I, (MSG))

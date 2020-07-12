@@ -35,24 +35,20 @@ class Dropout {
                Tensor<TensorT>* y) {
     CUDNNXX_DNN_CHECK(cudnnDropoutGetReserveSpaceSize(
         x.desc(), &reserve_space_size_in_bytes_));
-    CUDNNXX_CUDA_CHECK(cudaMalloc(&reserve_space_,
-                                  reserve_space_size_in_bytes_));
+    CUDNNXX_CUDA_CHECK(
+        cudaMalloc(&reserve_space_, reserve_space_size_in_bytes_));
     CUDNNXX_DNN_CHECK(cudnnDropoutForward(
         handle.raw_handle(), desc_, x.desc(), x.dev_mem(), y->desc(),
         y->dev_mem(), reserve_space_, reserve_space_size_in_bytes_));
   }
 
-  // void Backward(const Handle& handle, FactorT alpha, const Tensor<TensorT>&
-  // y,
-  //               const Tensor<TensorT>& dy, const Tensor<TensorT>& x,
-  //               FactorT beta, const Tensor<TensorT>* dx) {
-  //   CUDNNXX_DNN_CHECK(cudnnActivationBackward(
-  //       handle.raw_handle(), desc_, &alpha, y.desc(), y.dev_mem(), dy.desc(),
-  //       dy.dev_mem(), x.desc(), x.dev_mem(), &beta, dx->desc(),
-  //       dx->dev_mem()));
-
-  // free
-  // }
+  void Backward(const Handle& handle, const Tensor<TensorT>& dy,
+                const Tensor<TensorT>* dx) {
+    CUDNNXX_DNN_CHECK(cudnnDropoutBackward(
+        handle.raw_handle(), desc_, dy.desc(), dy.dev_mem(), dx->desc(),
+        dx->dev_mem(), reserve_space_, reserve_space_size_in_bytes_));
+    CUDNNXX_CUDA_CHECK(cudaFree(reserve_space_));
+  }
 
  private:
   void* states_ = nullptr;

@@ -11,11 +11,12 @@ namespace cudnnxx {
 template <typename TensorT, typename FactorT>
 class RNN {
  public:
-  RNN(const Handle& handle, const Dropout& dropout,
+  RNN(const Handle& handle, int hidden_size, int num_layers, const Dropout<TensorT>& dropout,
       cudnnRNNInputMode_t input_mode, cudnnDirectionMode_t direction,
       cudnnRNNMode_t mode, cudnnRNNAlgo_t algo, cudnnDataType_t dtype) {
     CUDNNXX_DNN_CHECK(cudnnCreateRNNDescriptor(&desc_));
     CUDNNXX_DNN_CHECK(cudnnSetRNNDescriptor_v6(handle.raw_handle(), desc_,
+                                               hidden_size, num_layers,
                                                dropout.desc(), input_mode,
                                                direction, mode, algo, dtype));
   }

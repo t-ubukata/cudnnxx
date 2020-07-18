@@ -19,28 +19,7 @@ TEST_BIN_DIR := ./test_bin
 test: $(TEST_BIN_DIR)/gtest_main
 	./test_bin/gtest_main
 
-TEST_OBJS := $(OBJ_DIR)/common_test.o \
-             $(OBJ_DIR)/op_tensor_test.o \
-             $(OBJ_DIR)/convolution_test.o \
-             $(OBJ_DIR)/activation_test.o \
-             $(OBJ_DIR)/reduce_tensor_test.o \
-             $(OBJ_DIR)/pooling_test.o \
-             $(OBJ_DIR)/dropout_test.o \
-             $(OBJ_DIR)/example_test.o
-
-
-# Google Test.
-GTEST_TARGET := $(GTEST_DIR)/googletest/libgtest_main.a
-
-$(GTEST_TARGET):
-	(cd $(GTEST_DIR)/googletest && CC=$(CC) CXX=$(CXX) cmake CMakeLists.txt && make)
-
-# The test main.
-$(TEST_BIN_DIR)/gtest_main: $(OBJS) $(TEST_OBJS) $(GTEST_TARGET)
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) $^ -o $@ $(GTEST_DIR)/googletest/libgtest.a
-
 # Test object files.
-
 $(OBJ_DIR)/common_test.o: $(SRC_DIR)/common_test.cc
 	$(CXX) $(CXXFLAGS) $^ -c -o $@
 $(OBJ_DIR)/op_tensor_test.o: $(SRC_DIR)/op_tensor_test.cc
@@ -55,8 +34,30 @@ $(OBJ_DIR)/pooling_test.o: $(SRC_DIR)/pooling_test.cc
 	$(CXX) $(CXXFLAGS) $^ -c -o $@
 $(OBJ_DIR)/dropout_test.o: $(SRC_DIR)/dropout_test.cc
 	$(CXX) $(CXXFLAGS) $^ -c -o $@
+$(OBJ_DIR)/rnn_test.o: $(SRC_DIR)/rnn_test.cc
+	$(CXX) $(CXXFLAGS) $^ -c -o $@
 $(OBJ_DIR)/example_test.o: $(SRC_DIR)/example_test.cc
 	$(CXX) $(CXXFLAGS) $^ -c -o $@
+
+TEST_OBJS := $(OBJ_DIR)/common_test.o \
+             $(OBJ_DIR)/op_tensor_test.o \
+             $(OBJ_DIR)/convolution_test.o \
+             $(OBJ_DIR)/activation_test.o \
+             $(OBJ_DIR)/reduce_tensor_test.o \
+             $(OBJ_DIR)/pooling_test.o \
+             $(OBJ_DIR)/dropout_test.o \
+             $(OBJ_DIR)/rnn_test.o \
+             $(OBJ_DIR)/example_test.o
+
+# Google Test.
+GTEST_TARGET := $(GTEST_DIR)/googletest/libgtest_main.a
+
+$(GTEST_TARGET):
+	(cd $(GTEST_DIR)/googletest && CC=$(CC) CXX=$(CXX) cmake CMakeLists.txt && make)
+
+# The test main.
+$(TEST_BIN_DIR)/gtest_main: $(OBJS) $(TEST_OBJS) $(GTEST_TARGET)
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) $^ -o $@ $(GTEST_DIR)/googletest/libgtest.a
 
 format:
 	clang-format -i -style=Google cudnnxx/*

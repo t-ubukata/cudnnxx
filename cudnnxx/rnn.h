@@ -3,6 +3,7 @@
 
 #include "cudnn.h"
 #include "cudnnxx/common.h"
+#include "cudnnxx/dropout.h"
 #include "cudnnxx/util.h"
 
 namespace cudnnxx {

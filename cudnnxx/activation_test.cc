@@ -32,15 +32,15 @@ TEST_F(ActivationTest, TestForward) {
   float* x_dev;
   CUDNNXX_CUDA_CHECK(cudaMalloc(&x_dev, size));
   CUDNNXX_CUDA_CHECK(cudaMemcpy(x_dev, x_host, size, cudaMemcpyHostToDevice));
-  Tensor<float> x(CUDNN_DATA_FLOAT, CUDNN_TENSOR_NCHW, n, c, h, w, x_dev);
+  Tensor<float> x_tensor(CUDNN_DATA_FLOAT, CUDNN_TENSOR_NCHW, n, c, h, w, x_dev);
 
   float* y_dev;
   CUDNNXX_CUDA_CHECK(cudaMalloc(&y_dev, size));
-  Tensor<float> y(CUDNN_DATA_FLOAT, CUDNN_TENSOR_NCHW, n, c, h, w, y_dev);
+  Tensor<float> y_tensor(CUDNN_DATA_FLOAT, CUDNN_TENSOR_NCHW, n, c, h, w, y_dev);
 
   Activation<float, float> activation(CUDNN_ACTIVATION_RELU,
                                       CUDNN_NOT_PROPAGATE_NAN);
-  activation.Forward(handle, 1, x, 0, &y);
+  activation.Forward(handle, 1, x_tensor, 0, &y_tensor);
   float y_host[n_elem] = {};
   CUDNNXX_CUDA_CHECK(cudaMemcpy(y_host, y_dev, size, cudaMemcpyDeviceToHost));
   float y_expected[n_elem] = {0,   0,   0,   0,   0,   0,   0,   0,

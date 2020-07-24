@@ -11,16 +11,16 @@ namespace cudnnxx {
 template <typename TensorT, typename FactorT>
 class RNN {
  public:
-  RNN(const Handle& handle, int hidden_size, int num_layers, const Dropout<TensorT>& dropout,
-      cudnnRNNInputMode_t input_mode, cudnnDirectionMode_t direction,
-      cudnnRNNMode_t mode, cudnnRNNAlgo_t algo, cudnnDataType_t dtype) {
+  RNN(const Handle& handle, int hidden_size, int num_layers,
+      const Dropout<TensorT>& dropout, cudnnRNNInputMode_t input_mode,
+      cudnnDirectionMode_t direction, cudnnRNNMode_t mode, cudnnRNNAlgo_t algo,
+      cudnnDataType_t dtype) {
     CUDNNXX_DNN_CHECK(cudnnCreateRNNDescriptor(&desc_));
     // NOTE: cuDNN documentation is wrong.
     //       This function takes 10 arguments in fact.
-    CUDNNXX_DNN_CHECK(cudnnSetRNNDescriptor_v6(handle.raw_handle(), desc_,
-                                               hidden_size, num_layers,
-                                               dropout.desc(), input_mode,
-                                               direction, mode, algo, dtype));
+    CUDNNXX_DNN_CHECK(cudnnSetRNNDescriptor_v6(
+        handle.raw_handle(), desc_, hidden_size, num_layers, dropout.desc(),
+        input_mode, direction, mode, algo, dtype));
   }
 
   ~RNN() { CUDNNXX_DNN_CHECK(cudnnDestroyRNNDescriptor(desc_)); }
@@ -48,9 +48,11 @@ class RNN {
   //       dx->dev_mem()));
   // }
 
-  size_t GetParamsSize(const Handle& handle, const Tensor<TensorT>& x, cudnnDataType_t dtype) {
+  size_t GetParamsSize(const Handle& handle, const Tensor<TensorT>& x,
+                       cudnnDataType_t dtype) {
     size_t size_in_bytes = 0;
-    CUDNNXX_DNN_CHECK(cudnnGetRNNParamsSize(handle.raw_handle(), desc_, x.desc(), &size_in_bytes, dtype));
+    CUDNNXX_DNN_CHECK(cudnnGetRNNParamsSize(handle.raw_handle(), desc_,
+                                            x.desc(), &size_in_bytes, dtype));
     return size_in_bytes;
   }
 

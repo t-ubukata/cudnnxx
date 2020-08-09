@@ -1,6 +1,8 @@
 #ifndef CUDNNXX_RNN_H_
 #define CUDNNXX_RNN_H_
 
+#include <vector>
+
 #include "cudnn.h"
 #include "cudnnxx/common.h"
 #include "cudnnxx/dropout.h"
@@ -31,24 +33,6 @@ class RNN {
 
   cudnnRNNDescriptor_t desc() const { return desc_; }
 
-  // void Forward(const Handle& handle, FactorT alpha, const Tensor<TensorT>& x,
-  //              FactorT beta, Tensor<TensorT>* y) {
-  //   CUDNNXX_DNN_CHECK(cudnnActivationForward(handle.raw_handle(), desc_,
-  //   &alpha,
-  //                                            x.desc(), x.dev_mem(), &beta,
-  //                                            y->desc(), y->dev_mem()));
-  // }
-  //
-  // void Backward(const Handle& handle, FactorT alpha, const Tensor<TensorT>&
-  // y,
-  //               const Tensor<TensorT>& dy, const Tensor<TensorT>& x,
-  //               FactorT beta, const Tensor<TensorT>* dx) {
-  //   CUDNNXX_DNN_CHECK(cudnnActivationBackward(
-  //       handle.raw_handle(), desc_, &alpha, y.desc(), y.dev_mem(), dy.desc(),
-  //       dy.dev_mem(), x.desc(), x.dev_mem(), &beta, dx->desc(),
-  //       dx->dev_mem()));
-  // }
-
   size_t GetParamsSize(const Handle& handle, const Tensor<TensorT>& x,
                        cudnnDataType_t dtype) {
     size_t size_in_bytes = 0;
@@ -57,8 +41,19 @@ class RNN {
     return size_in_bytes;
   }
 
+  size_t GetTrainingReserveSize(const Handle& handle, int seq_length,
+                                const std::vector<Tensor<float>>& xs) {
+    std::vector<cudnnTensorDescriptor_t> x_descs;
+    for (int i = 0; i < seq_length; ++i) {
+      x_descs.push_back(xs[i].desc());
+    }
+    size_t size_in_bytes = 0;
+    CUDNNXX_DNN_CHECK(cudnnGetRNNTrainingReserveSize(
+        handle.raw_handle(), desc_, seq_length, x_descs.data(), &size_in_bytes));
+    return size_in_bytes;
+  }
+
   // TODO:
-  // cudnnGetRNNTrainingReserveSize
   // cudnnGetRNNWorkspaceSize
 
   // cudnnRNNForwardInference

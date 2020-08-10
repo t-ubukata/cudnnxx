@@ -1,4 +1,7 @@
+#include <utility>
+
 #include "cudnnxx/common.h"
+
 #include "gtest/gtest.h"
 
 namespace cudnnxx {
@@ -90,6 +93,23 @@ TEST_F(TensorTest, TestConstructorNdEx) {
   CUDNNXX_CUDA_CHECK(cudaFree(mem_dev));
 }
 
+TEST_F(TensorTest, TestMoveConstructor) {
+  constexpr int n = 2;
+  constexpr int c = 3;
+  constexpr int h = 2;
+  constexpr int w = 2;
+  constexpr int n_elem = n * c * h * w;
+  float mem_host[n_elem] = {};
+  float* mem_dev = nullptr;
+  size_t size = sizeof(float) * n_elem;
+  CUDNNXX_CUDA_CHECK(cudaMalloc(&mem_dev, size));
+  CUDNNXX_CUDA_CHECK(
+      cudaMemcpy(mem_dev, mem_host, size, cudaMemcpyHostToDevice));
+  Tensor<float> t(CUDNN_DATA_FLOAT, CUDNN_TENSOR_NCHW, n, c, h, w, mem_dev);
+  Tensor<float> t2(std::move(t));
+  CUDNNXX_CUDA_CHECK(cudaFree(mem_dev));
+}
+
 class FilterTest : public ::testing::Test {};
 
 TEST_F(FilterTest, TestConstructor4d) {
@@ -123,6 +143,23 @@ TEST_F(FilterTest, TestConstructorNd) {
   constexpr int n_dims = 4;
   int dims[n_dims] = {k, c, r, s};
   Filter<float> f(CUDNN_DATA_FLOAT, CUDNN_TENSOR_NCHW, n_dims, dims, mem_dev);
+  CUDNNXX_CUDA_CHECK(cudaFree(mem_dev));
+}
+
+TEST_F(FilterTest, TestMoveConstructor) {
+  constexpr int k = 1;  // the number of output feature maps.
+  constexpr int c = 3;  // the number of input feature maps.
+  constexpr int h = 5;  // The height of each filter.
+  constexpr int w = 5;  // The width of each filter.
+  constexpr int n_elem = k * c * h * w;
+  float* mem_host[n_elem] = {};
+  float* mem_dev = nullptr;
+  size_t size = sizeof(float) * n_elem;
+  CUDNNXX_CUDA_CHECK(cudaMalloc(&mem_dev, size));
+  CUDNNXX_CUDA_CHECK(
+      cudaMemcpy(mem_dev, mem_host, size, cudaMemcpyHostToDevice));
+  Filter<float> f(CUDNN_DATA_FLOAT, CUDNN_TENSOR_NCHW, k, c, h, w, mem_dev);
+  Filter<float> f2(std::move(f));
   CUDNNXX_CUDA_CHECK(cudaFree(mem_dev));
 }
 

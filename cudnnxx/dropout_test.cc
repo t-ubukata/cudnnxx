@@ -1,4 +1,5 @@
 #include "cudnnxx/dropout.h"
+
 #include "cudnnxx/activation.h"
 #include "gtest/gtest.h"
 

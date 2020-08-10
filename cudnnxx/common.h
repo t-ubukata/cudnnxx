@@ -1,6 +1,8 @@
 #ifndef CUDNNXX_COMMON_H_
 #define CUDNNXX_COMMON_H_
 
+#include <utility>
+
 #include "cudnn.h"
 #include "cudnnxx/util.h"
 
@@ -60,6 +62,12 @@ class Tensor {
   Tensor(const Tensor&) = delete;
   Tensor operator=(const Tensor&) = delete;
 
+  Tensor(Tensor&& rhs) noexcept
+      : desc_(std::move(rhs.desc_)), dev_mem_(std::move(rhs.dev_mem_)) {
+    rhs.desc_ = nullptr;
+    rhs.dev_mem_ = nullptr;
+  };
+
   ~Tensor() { CUDNNXX_DNN_CHECK(cudnnDestroyTensorDescriptor(desc_)); }
 
   cudnnTensorDescriptor_t desc() const { return desc_; }
@@ -92,6 +100,12 @@ class Filter {
 
   Filter(const Filter&) = delete;
   Filter operator=(const Filter&) = delete;
+
+  Filter(Filter&& rhs) noexcept
+      : desc_(std::move(rhs.desc_)), dev_mem_(std::move(rhs.dev_mem_)) {
+    rhs.desc_ = nullptr;
+    rhs.dev_mem_ = nullptr;
+  };
 
   ~Filter() { CUDNNXX_DNN_CHECK(cudnnDestroyFilterDescriptor(desc_)); }
 

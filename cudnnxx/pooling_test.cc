@@ -1,4 +1,5 @@
 #include "cudnnxx/pooling.h"
+
 #include "gtest/gtest.h"
 
 namespace cudnnxx {

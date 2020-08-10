@@ -48,8 +48,9 @@ class RNN {
       x_descs.push_back(xs[i].desc());
     }
     size_t size_in_bytes = 0;
-    CUDNNXX_DNN_CHECK(cudnnGetRNNTrainingReserveSize(
-        handle.raw_handle(), desc_, seq_length, x_descs.data(), &size_in_bytes));
+    CUDNNXX_DNN_CHECK(cudnnGetRNNTrainingReserveSize(handle.raw_handle(), desc_,
+                                                     seq_length, x_descs.data(),
+                                                     &size_in_bytes));
     return size_in_bytes;
   }
 

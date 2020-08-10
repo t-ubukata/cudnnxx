@@ -1,4 +1,5 @@
 #include "cudnnxx/activation.h"
+
 #include "gtest/gtest.h"
 
 namespace cudnnxx {

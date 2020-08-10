@@ -1,4 +1,5 @@
 #include "cudnnxx/convolution.h"
+
 #include "gtest/gtest.h"
 
 namespace cudnnxx {

@@ -1,4 +1,5 @@
 #include "cudnnxx/op_tensor.h"
+
 #include "gtest/gtest.h"
 
 namespace cudnnxx {

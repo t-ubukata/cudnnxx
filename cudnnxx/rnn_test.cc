@@ -1,7 +1,8 @@
+#include "cudnnxx/rnn.h"
+
 #include <vector>
 
 #include "cudnnxx/dropout.h"
-#include "cudnnxx/rnn.h"
 #include "gtest/gtest.h"
 
 namespace cudnnxx {
@@ -85,7 +86,8 @@ TEST_F(RNNTest, DISABLED_TestGetRNNTrainingReserveSize) {
   //   x_tensors.emplace_back(dtype, n_dims, dims, strides, xs_dev[i]);
   // }
   //
-  // auto reserve_size = rnn.GetTrainingReserveSize(handle, seq_length, x_tensors);
+  // auto reserve_size = rnn.GetTrainingReserveSize(handle, seq_length,
+  // x_tensors);
   //
   // size_t reserve_size_ref = 0;
   //
@@ -95,7 +97,8 @@ TEST_F(RNNTest, DISABLED_TestGetRNNTrainingReserveSize) {
   // }
   //
   // CUDNNXX_DNN_CHECK(cudnnGetRNNTrainingReserveSize(
-  //     handle.raw_handle(), rnn.desc(), seq_length, x_descs.data(), &reserve_size_ref));
+  //     handle.raw_handle(), rnn.desc(), seq_length, x_descs.data(),
+  //     &reserve_size_ref));
   //
   // EXPECT_EQ(reserve_size_ref, reserve_size);
   // for (int i = 0; i < seq_length; ++i) {

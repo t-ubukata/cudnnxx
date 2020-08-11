@@ -15,7 +15,5 @@
 //   Algorithm
 //   AlgorithmPerformance
 //   SpatialTransformer
-//
-// Consider about mutex, copy, move, and mutation.
 
 #endif  // CUDNNXX_CUDNNXX_H_

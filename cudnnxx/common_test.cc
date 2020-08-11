@@ -1,6 +1,6 @@
-#include <utility>
-
 #include "cudnnxx/common.h"
+
+#include <utility>
 
 #include "gtest/gtest.h"
 

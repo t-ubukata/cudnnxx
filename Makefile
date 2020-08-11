@@ -1,6 +1,3 @@
-CC := clang
-CXX := clang++
-
 CUDA_DIR := /usr/local/cuda
 GTEST_DIR := ./external/googletest
 CXXFLAGS := -g -std=c++11 -Wall -Wextra -Werror -pedantic -pedantic-errors \
@@ -21,23 +18,23 @@ test: $(TEST_BIN_DIR)/gtest_main
 
 # Test object files.
 $(OBJ_DIR)/common_test.o: $(SRC_DIR)/common_test.cc
-	$(CXX) $(CXXFLAGS) $^ -c -o $@
+	$(CXX) $^ $(CXXFLAGS) -c -o $@
 $(OBJ_DIR)/op_tensor_test.o: $(SRC_DIR)/op_tensor_test.cc
-	$(CXX) $(CXXFLAGS) $^ -c -o $@
+	$(CXX) $^ $(CXXFLAGS) -c -o $@
 $(OBJ_DIR)/convolution_test.o: $(SRC_DIR)/convolution_test.cc
-	$(CXX) $(CXXFLAGS) $^ -c -o $@
+	$(CXX) $^ $(CXXFLAGS) -c -o $@
 $(OBJ_DIR)/activation_test.o: $(SRC_DIR)/activation_test.cc
-	$(CXX) $(CXXFLAGS) $^ -c -o $@
+	$(CXX) $^ $(CXXFLAGS) -c -o $@
 $(OBJ_DIR)/reduce_tensor_test.o: $(SRC_DIR)/reduce_tensor_test.cc
-	$(CXX) $(CXXFLAGS) $^ -c -o $@
+	$(CXX) $^ $(CXXFLAGS) -c -o $@
 $(OBJ_DIR)/pooling_test.o: $(SRC_DIR)/pooling_test.cc
-	$(CXX) $(CXXFLAGS) $^ -c -o $@
+	$(CXX) $^ $(CXXFLAGS) -c -o $@
 $(OBJ_DIR)/dropout_test.o: $(SRC_DIR)/dropout_test.cc
-	$(CXX) $(CXXFLAGS) $^ -c -o $@
+	$(CXX) $^ $(CXXFLAGS) -c -o $@
 $(OBJ_DIR)/rnn_test.o: $(SRC_DIR)/rnn_test.cc
-	$(CXX) $(CXXFLAGS) $^ -c -o $@
+	$(CXX) $^ $(CXXFLAGS) -c -o $@
 $(OBJ_DIR)/example_test.o: $(SRC_DIR)/example_test.cc
-	$(CXX) $(CXXFLAGS) $^ -c -o $@
+	$(CXX) $^ $(CXXFLAGS) -c -o $@
 
 TEST_OBJS := $(OBJ_DIR)/common_test.o \
              $(OBJ_DIR)/op_tensor_test.o \
@@ -57,7 +54,7 @@ $(GTEST_TARGET):
 
 # The test main.
 $(TEST_BIN_DIR)/gtest_main: $(OBJS) $(TEST_OBJS) $(GTEST_TARGET)
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) $^ -o $@ $(GTEST_DIR)/googletest/libgtest.a
+	$(CXX) $^ $(GTEST_DIR)/googletest/libgtest.a $(LDFLAGS) -o $@
 
 format:
 	clang-format -i -style=Google cudnnxx/*

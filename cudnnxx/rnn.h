@@ -54,9 +54,20 @@ class RNN {
     return size_in_bytes;
   }
 
-  // TODO:
-  // cudnnGetRNNWorkspaceSize
+  size_t GetWorkspaceSize(const Handle& handle, int seq_length,
+                          const std::vector<Tensor<float>>& xs) {
+    std::vector<cudnnTensorDescriptor_t> x_descs;
+    for (int i = 0; i < seq_length; ++i) {
+      x_descs.push_back(xs[i].desc());
+    }
+    size_t size_in_bytes = 0;
+    CUDNNXX_DNN_CHECK(cudnnGetRNNWorkspaceSize(handle.raw_handle(), desc_,
+                                               seq_length, x_descs.data(),
+                                               &size_in_bytes));
+    return size_in_bytes;
+  }
 
+  // TODO:
   // cudnnRNNForwardInference
   // cudnnRNNForwardTraining
 

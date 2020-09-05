@@ -2,6 +2,7 @@
 #define CUDNNXX_COMMON_H_
 
 #include <utility>
+#include <vector>
 
 #include "cudnn.h"
 #include "cudnnxx/util.h"
@@ -115,6 +116,48 @@ class Filter {
  private:
   cudnnFilterDescriptor_t desc_;
   T* dev_mem_;
+};
+
+// The caller must allocate dev_mem previously.
+template <typename T>
+class TensorArray {
+ public:
+  TensorArray(cudnnDataType_t dtype, int n_dims, int dims[], int strides[],
+              T* dev_mem, int n_tensors)
+      : dev_mem_(dev_mem), n_tensors_(n_tensors) {
+    for (int i = 0; i < n_tensors_; ++i) {
+      cudnnTensorDescriptor_t desc;
+      CUDNNXX_DNN_CHECK(cudnnCreateTensorDescriptor(&desc));
+      CUDNNXX_DNN_CHECK(
+          cudnnSetTensorNdDescriptor(desc, dtype, n_dims, dims, strides));
+      descs_.push_back(desc);
+    }
+  }
+
+  TensorArray(const TensorArray&) = delete;
+  TensorArray operator=(const TensorArray&) = delete;
+
+  TensorArray(TensorArray&& rhs) noexcept
+      : descs_(std::move(rhs.descs_)),
+        dev_mem_(std::move(rhs.dev_mem_)),
+        n_tensors_(rhs.n_tensors_) {
+    rhs.descs_ = nullptr;
+    rhs.dev_mem_ = nullptr;
+  };
+
+  ~TensorArray() {
+    for (int i = 0; i < n_tensors_; ++i) {
+      CUDNNXX_DNN_CHECK(cudnnDestroyTensorDescriptor(descs_[i]));
+    }
+  }
+
+  std::vector<cudnnTensorDescriptor_t> descs() const { return descs_; }
+  T* dev_mem() const { return dev_mem_; }
+
+ private:
+  std::vector<cudnnTensorDescriptor_t> descs_;
+  T* dev_mem_;
+  const int n_tensors_;
 };
 
 }  // namespace cudnnxx

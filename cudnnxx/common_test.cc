@@ -163,4 +163,25 @@ TEST_F(FilterTest, TestMoveConstructor) {
   CUDNNXX_CUDA_CHECK(cudaFree(mem_dev));
 }
 
+class TensorArrayTest : public ::testing::Test {};
+
+TEST_F(TensorArrayTest, TestConstructorNd) {
+  constexpr int seq_len = 20;
+  constexpr int input_size = 512;
+  constexpr int mini_batch = 64;
+  constexpr int n_elem = seq_len * input_size * mini_batch;
+  float* mem_host[n_elem] = {};
+  float* mem_dev = nullptr;
+  size_t size = sizeof(float) * n_elem;
+  CUDNNXX_CUDA_CHECK(cudaMalloc(&mem_dev, size));
+  CUDNNXX_CUDA_CHECK(
+      cudaMemcpy(mem_dev, mem_host, size, cudaMemcpyHostToDevice));
+  constexpr int n_dims = 3;
+  int dims[n_dims] = {mini_batch, input_size, 1};
+  int strides[n_dims] = {dims[2] * dims[1], dims[1], 1};
+  TensorArray<float> ta(CUDNN_DATA_FLOAT, n_dims, dims, strides, mem_dev,
+                        seq_len);
+  CUDNNXX_CUDA_CHECK(cudaFree(mem_dev));
+}
+
 }  // namespace cudnnxx

@@ -42,15 +42,10 @@ class RNN {
   }
 
   size_t GetTrainingReserveSize(const Handle& handle, int seq_length,
-                                const std::vector<Tensor<float>>& xs) {
-    std::vector<cudnnTensorDescriptor_t> x_descs;
-    for (int i = 0; i < seq_length; ++i) {
-      x_descs.push_back(xs[i].desc());
-    }
+                                const TensorArray<TensorT>& x) {
     size_t size_in_bytes = 0;
-    CUDNNXX_DNN_CHECK(cudnnGetRNNTrainingReserveSize(handle.raw_handle(), desc_,
-                                                     seq_length, x_descs.data(),
-                                                     &size_in_bytes));
+    CUDNNXX_DNN_CHECK(cudnnGetRNNTrainingReserveSize(
+        handle.raw_handle(), desc_, seq_length, x.descs(), &size_in_bytes));
     return size_in_bytes;
   }
 
@@ -67,30 +62,20 @@ class RNN {
     return size_in_bytes;
   }
 
-  // void ForwardTraining(const Handle& handle, int seq_length,
-  //                      const std::vector<Tensor<float>>& xs,
-  //                      const Tensor<TensorT>& hx, const Tensor<TensorT>& cx,
-  //                      const Tensor<TensorT>& w, std::vector<Tensor<float>>*
-  //                      y, Tensor<TensorT>* hy, Tensor<TensorT>* cy, void*
-  //                      workspace, size_t workspace_size_in_bytes, void*
-  //                      reserve_space, size_t reserve_space_size_in_bytes) {
-  //   std::vector<cudnnTensorDescriptor_t> x_descs;
-  //   std::vector<void*> x_dev_mems;
-  //   for (int i = 0; i < seq_length; ++i) {
-  //     x_descs.push_back(xs[i].desc());
-  //     x_dev_memes.push_back(xs[i].dev_mem());
-  //   }
-  //   CUDNNXX_DNN_CHECK(cudnnRNNForwardTraining(
-  //       handle.raw_handle(), desc_, seq_length, x_descs.data(), x.dev_mem(),
-  //       const cudnnTensorDescriptor_t hxDesc, const void* hx,
-  //       const cudnnTensorDescriptor_t cxDesc, const void* cx,
-  //       const cudnnFilterDescriptor_t wDesc, const void* w,
-  //       const cudnnTensorDescriptor_t* yDesc, void* y,
-  //       const cudnnTensorDescriptor_t hyDesc, void* hy,
-  //       const cudnnTensorDescriptor_t cyDesc, void* cy, workspace,
-  //       workspace_size_in_bytes, reserve_space,
-  //       reserve_space_size_in_bytes));
-  // }
+  void ForwardTraining(const Handle& handle, int seq_length,
+                       const TensorArray<TensorT>& x, const Tensor<TensorT>& hx,
+                       const Tensor<TensorT>& cx, const Tensor<TensorT>& w,
+                       TensorArray<TensorT>* y, Tensor<TensorT>* hy,
+                       Tensor<TensorT>* cy, void* workspace,
+                       size_t workspace_size_in_bytes, void* reserve_space,
+                       size_t reserve_space_size_in_bytes) {
+    CUDNNXX_DNN_CHECK(cudnnRNNForwardTraining(
+        handle.raw_handle(), desc_, seq_length, x.descs().data(), x.dev_mem(),
+        hx.desc(), hx.dev_mem(), cx.desc(), cx.dev_mem(), w.desc(), w.dev_mem(),
+        y->descs().data(), y->dev_mem(), hy.desc(), hy.dev_mem(), cy.desc(),
+        cy.dev_mem(), workspace, workspace_size_in_bytes, reserve_space,
+        reserve_space_size_in_bytes));
+  }
 
   // TODO:
   // cudnnRNNForwardInference

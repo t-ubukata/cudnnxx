@@ -125,12 +125,11 @@ class TensorArray {
   TensorArray(cudnnDataType_t dtype, int n_dims, int dims[], int strides[],
               T* dev_mem, int n_tensors)
       : dev_mem_(dev_mem), n_tensors_(n_tensors) {
+    desc_vec.reserve(n_tensors_);
     for (int i = 0; i < n_tensors_; ++i) {
-      cudnnTensorDescriptor_t desc;
-      CUDNNXX_DNN_CHECK(cudnnCreateTensorDescriptor(&desc));
-      CUDNNXX_DNN_CHECK(
-          cudnnSetTensorNdDescriptor(desc, dtype, n_dims, dims, strides));
-      descs_.push_back(desc);
+      CUDNNXX_DNN_CHECK(cudnnCreateTensorDescriptor(&desc_vec[i]));
+      CUDNNXX_DNN_CHECK(cudnnSetTensorNdDescriptor(desc_vec[i], dtype, n_dims,
+                                                   dims, strides));
     }
   }
 
@@ -138,24 +137,24 @@ class TensorArray {
   TensorArray operator=(const TensorArray&) = delete;
 
   TensorArray(TensorArray&& rhs) noexcept
-      : descs_(std::move(rhs.descs_)),
+      : desc_vec(std::move(rhs.desc_vec)),
         dev_mem_(std::move(rhs.dev_mem_)),
         n_tensors_(rhs.n_tensors_) {
-    rhs.descs_ = nullptr;
+    rhs.desc_vec = nullptr;
     rhs.dev_mem_ = nullptr;
   };
 
   ~TensorArray() {
     for (int i = 0; i < n_tensors_; ++i) {
-      CUDNNXX_DNN_CHECK(cudnnDestroyTensorDescriptor(descs_[i]));
+      CUDNNXX_DNN_CHECK(cudnnDestroyTensorDescriptor(desc_vec[i]));
     }
   }
 
-  std::vector<cudnnTensorDescriptor_t> descs() const { return descs_; }
+  cudnnTensorDescriptor_t const* descs() const { return desc_vec.data(); }
   T* dev_mem() const { return dev_mem_; }
 
  private:
-  std::vector<cudnnTensorDescriptor_t> descs_;
+  std::vector<cudnnTensorDescriptor_t> desc_vec;
   T* dev_mem_;
   const int n_tensors_;
 };

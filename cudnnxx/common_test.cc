@@ -40,7 +40,7 @@ TEST_F(TensorTest, TestConstructor4dEx) {
   constexpr int h = 2;
   constexpr int w = 2;
   constexpr int n_elem = n * c * h * w;
-  float* mem_host[n_elem] = {};
+  float mem_host[n_elem] = {};
   float* mem_dev = nullptr;
   size_t size = sizeof(float) * n_elem;
   CUDNNXX_CUDA_CHECK(cudaMalloc(&mem_dev, size));
@@ -62,7 +62,7 @@ TEST_F(TensorTest, TestConstructorNd) {
   constexpr int h = 2;
   constexpr int w = 2;
   constexpr int n_elem = n * h * w;
-  float* mem_host[n_elem] = {};
+  float mem_host[n_elem] = {};
   float* mem_dev = nullptr;
   size_t size = sizeof(float) * n_elem;
   CUDNNXX_CUDA_CHECK(cudaMalloc(&mem_dev, size));
@@ -82,7 +82,7 @@ TEST_F(TensorTest, TestConstructorNdEx) {
   constexpr int h = 2;
   constexpr int w = 2;
   constexpr int n_elem = n * c * h * w;
-  float* mem_host[n_elem] = {};
+  float mem_host[n_elem] = {};
   float* mem_dev = nullptr;
   size_t size = sizeof(float) * n_elem;
   CUDNNXX_CUDA_CHECK(cudaMalloc(&mem_dev, size));
@@ -118,7 +118,7 @@ TEST_F(FilterTest, TestConstructor4d) {
   constexpr int h = 5;  // The height of each filter.
   constexpr int w = 5;  // The width of each filter.
   constexpr int n_elem = k * c * h * w;
-  float* mem_host[n_elem] = {};
+  float mem_host[n_elem] = {};
   float* mem_dev = nullptr;
   size_t size = sizeof(float) * n_elem;
   CUDNNXX_CUDA_CHECK(cudaMalloc(&mem_dev, size));
@@ -134,7 +134,7 @@ TEST_F(FilterTest, TestConstructorNd) {
   constexpr int r = 5;  // The number of rows per filter.
   constexpr int s = 5;  // The number of columns per filter.
   constexpr int n_elem = k * c * r * s;
-  float* mem_host[n_elem] = {};
+  float mem_host[n_elem] = {};
   float* mem_dev = nullptr;
   size_t size = sizeof(float) * n_elem;
   CUDNNXX_CUDA_CHECK(cudaMalloc(&mem_dev, size));
@@ -152,7 +152,7 @@ TEST_F(FilterTest, TestMoveConstructor) {
   constexpr int h = 5;  // The height of each filter.
   constexpr int w = 5;  // The width of each filter.
   constexpr int n_elem = k * c * h * w;
-  float* mem_host[n_elem] = {};
+  float mem_host[n_elem] = {};
   float* mem_dev = nullptr;
   size_t size = sizeof(float) * n_elem;
   CUDNNXX_CUDA_CHECK(cudaMalloc(&mem_dev, size));
@@ -170,7 +170,7 @@ TEST_F(TensorArrayTest, TestConstructorNd) {
   constexpr int input_size = 512;
   constexpr int mini_batch = 64;
   constexpr int n_elem = seq_len * input_size * mini_batch;
-  float* mem_host[n_elem] = {};
+  float mem_host[n_elem] = {};
   float* mem_dev = nullptr;
   size_t size = sizeof(float) * n_elem;
   CUDNNXX_CUDA_CHECK(cudaMalloc(&mem_dev, size));
@@ -178,7 +178,7 @@ TEST_F(TensorArrayTest, TestConstructorNd) {
       cudaMemcpy(mem_dev, mem_host, size, cudaMemcpyHostToDevice));
   constexpr int n_dims = 3;
   int dims[n_dims] = {mini_batch, input_size, 1};
-  int strides[n_dims] = {dims[2] * dims[1], dims[1], 1};
+  int strides[n_dims] = {dims[2] * dims[1], dims[2], 1};
   TensorArray<float> ta(CUDNN_DATA_FLOAT, n_dims, dims, strides, mem_dev,
                         seq_len);
   CUDNNXX_CUDA_CHECK(cudaFree(mem_dev));

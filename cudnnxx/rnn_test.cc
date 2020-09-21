@@ -30,19 +30,19 @@ TEST_F(RNNTest, TestGetParamSize) {
                         CUDNN_UNIDIRECTIONAL, CUDNN_RNN_RELU,
                         CUDNN_RNN_ALGO_STANDARD, dtype);
 
-  constexpr int n = 2;
-  constexpr int c = 3;
-  constexpr int h = 2;
-  constexpr int w = 2;
-  constexpr int n_elem = n * c * h * w;
-  float x_host[n_elem] = {0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8,
-                          0.9, 1.0, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6,
-                          1.7, 1.8, 1.9, 2.0, 2.1, 2.2, 2.3, 2.4};
+  constexpr int n_dims = 3;
+  constexpr int batch_size = 2;
+  constexpr int input_size = 3;
+  int dims[n_dims] = {batch_size, input_size, 1};
+  int strides[n_dims] = {dims[2] * dims[1], dims[2], 1};
+  constexpr int n_elem = input_size * batch_size;
+  float x_host[n_elem] = {0.1, 0.2, 0.3, 0.4, 0.5, 0.6};
+
   float* x_dev = nullptr;
   size_t size = sizeof(float) * n_elem;
   CUDNNXX_CUDA_CHECK(cudaMalloc(&x_dev, size));
   CUDNNXX_CUDA_CHECK(cudaMemcpy(x_dev, x_host, size, cudaMemcpyHostToDevice));
-  Tensor<float> x_tensor(dtype, CUDNN_TENSOR_NCHW, n, c, h, w, x_dev);
+  Tensor<float> x_tensor(dtype, n_dims, dims, strides, x_dev);
 
   auto size_in_bytes = rnn.GetParamsSize(handle, x_tensor, dtype);
 

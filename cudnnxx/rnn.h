@@ -72,9 +72,20 @@ class RNN {
         reserve_space_size_in_bytes));
   }
 
-  // TODO:
-  // cudnnRNNForwardInference
+  void ForwardInference(const Handle& handle, int seq_length,
+                        const TensorArray<TensorT>& x,
+                        const Tensor<TensorT>& hx, const Tensor<TensorT>& cx,
+                        const Filter<TensorT>& w, TensorArray<TensorT>* y,
+                        Tensor<TensorT>* hy, Tensor<TensorT>* cy,
+                        void* workspace, size_t workspace_size_in_bytes) {
+    CUDNNXX_DNN_CHECK(cudnnRNNForwardInference(
+        handle.raw_handle(), desc_, seq_length, x.descs(), x.dev_mem(),
+        hx.desc(), hx.dev_mem(), cx.desc(), cx.dev_mem(), w.desc(), w.dev_mem(),
+        y->descs(), y->dev_mem(), hy->desc(), hy->dev_mem(), cy->desc(),
+        cy->dev_mem(), workspace, workspace_size_in_bytes));
+  }
 
+  // TODO:
   // cudnnRNNForwardTrainingEx
   // cudnnRNNForwardInferenceEx
 

@@ -33,11 +33,11 @@ class RNN {
 
   cudnnRNNDescriptor_t desc() const { return desc_; }
 
-  size_t GetParamsSize(const Handle& handle, const Tensor<TensorT>& x,
+  size_t GetParamsSize(const Handle& handle, const TensorArray<TensorT>& x,
                        cudnnDataType_t dtype) {
     size_t size_in_bytes = 0;
-    CUDNNXX_DNN_CHECK(cudnnGetRNNParamsSize(handle.raw_handle(), desc_,
-                                            x.desc(), &size_in_bytes, dtype));
+    CUDNNXX_DNN_CHECK(cudnnGetRNNParamsSize(
+        handle.raw_handle(), desc_, x.descs()[0], &size_in_bytes, dtype));
     return size_in_bytes;
   }
 
@@ -52,24 +52,23 @@ class RNN {
   size_t GetWorkspaceSize(const Handle& handle, int seq_length,
                           const TensorArray<TensorT>& x) {
     size_t size_in_bytes = 0;
-    CUDNNXX_DNN_CHECK(cudnnGetRNNWorkspaceSize(handle.raw_handle(), desc_,
-                                               seq_length, x.descs(),
-                                               &size_in_bytes));
+    CUDNNXX_DNN_CHECK(cudnnGetRNNWorkspaceSize(
+        handle.raw_handle(), desc_, seq_length, x.descs(), &size_in_bytes));
     return size_in_bytes;
   }
 
   void ForwardTraining(const Handle& handle, int seq_length,
                        const TensorArray<TensorT>& x, const Tensor<TensorT>& hx,
-                       const Tensor<TensorT>& cx, const Tensor<TensorT>& w,
+                       const Tensor<TensorT>& cx, const Filter<TensorT>& w,
                        TensorArray<TensorT>* y, Tensor<TensorT>* hy,
                        Tensor<TensorT>* cy, void* workspace,
                        size_t workspace_size_in_bytes, void* reserve_space,
                        size_t reserve_space_size_in_bytes) {
     CUDNNXX_DNN_CHECK(cudnnRNNForwardTraining(
-        handle.raw_handle(), desc_, seq_length, x.descs().data(), x.dev_mem(),
+        handle.raw_handle(), desc_, seq_length, x.descs(), x.dev_mem(),
         hx.desc(), hx.dev_mem(), cx.desc(), cx.dev_mem(), w.desc(), w.dev_mem(),
-        y->descs().data(), y->dev_mem(), hy.desc(), hy.dev_mem(), cy.desc(),
-        cy.dev_mem(), workspace, workspace_size_in_bytes, reserve_space,
+        y->descs(), y->dev_mem(), hy->desc(), hy->dev_mem(), cy->desc(),
+        cy->dev_mem(), workspace, workspace_size_in_bytes, reserve_space,
         reserve_space_size_in_bytes));
   }
 

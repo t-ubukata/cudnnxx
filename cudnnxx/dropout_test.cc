@@ -25,7 +25,6 @@ TEST_F(DropoutTest, TestForward) {
   size_t size = sizeof(float) * n_elem;
 
   // Target.
-
   float x_host[n_elem] = {0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8,
                           0.9, 1.0, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6,
                           1.7, 1.8, 1.9, 2.0, 2.1, 2.2, 2.3, 2.4};
@@ -43,13 +42,13 @@ TEST_F(DropoutTest, TestForward) {
   float dropout_p = 0.5;
   unsigned long long seed = 20200627;
   Dropout<float> dropout(handle, dropout_p, seed);
+
   dropout.Forward(handle, x_tensor, &y_tensor);
 
   float y_host[n_elem] = {};
   CUDNNXX_CUDA_CHECK(cudaMemcpy(y_host, y_dev, size, cudaMemcpyDeviceToHost));
 
   // Reference.
-
   float* y_ref_dev = nullptr;
   CUDNNXX_CUDA_CHECK(cudaMalloc(&y_ref_dev, size));
   Tensor<float> y_ref_tensor(CUDNN_DATA_FLOAT, CUDNN_TENSOR_NCHW, n, c, h, w,
@@ -83,10 +82,13 @@ TEST_F(DropoutTest, TestForward) {
       cudaMemcpy(y_ref_host, y_ref_dev, size, cudaMemcpyDeviceToHost));
 
   // Check.
-
   for (int i = 0; i < n_elem; ++i) {
     EXPECT_NEAR(y_ref_host[i], y_host[i], 1e-4) << "i: " << i;
   }
+
+  // This is necessary to free reserve_space_.
+  dropout.Backward(handle, y_tensor, &x_tensor);
+
   CUDNNXX_CUDA_CHECK(cudaFree(reserve_space_ref));
   CUDNNXX_CUDA_CHECK(cudaFree(states_ref));
   CUDNNXX_CUDA_CHECK(cudaFree(y_ref_dev));
@@ -104,7 +106,6 @@ TEST_F(DropoutTest, TestBackward) {
   size_t size = sizeof(float) * n_elem;
 
   // Target.
-
   float x_host[n_elem] = {0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8,
                           0.9, 1.0, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6,
                           1.7, 1.8, 1.9, 2.0, 2.1, 2.2, 2.3, 2.4};
@@ -135,7 +136,6 @@ TEST_F(DropoutTest, TestBackward) {
   CUDNNXX_CUDA_CHECK(cudaMemcpy(dx_host, dx_dev, size, cudaMemcpyDeviceToHost));
 
   // Reference.
-
   float* y_ref_dev = nullptr;
   CUDNNXX_CUDA_CHECK(cudaMalloc(&y_ref_dev, size));
   Tensor<float> y_ref_tensor(CUDNN_DATA_FLOAT, CUDNN_TENSOR_NCHW, n, c, h, w,
@@ -179,10 +179,10 @@ TEST_F(DropoutTest, TestBackward) {
       cudaMemcpy(dx_ref_host, dx_ref_dev, size, cudaMemcpyDeviceToHost));
 
   // Check.
-
   for (int i = 0; i < n_elem; ++i) {
     EXPECT_NEAR(dx_ref_host[i], dx_host[i], 1e-4) << "i: " << i;
   }
+
   CUDNNXX_CUDA_CHECK(cudaFree(dx_ref_dev));
   CUDNNXX_CUDA_CHECK(cudaFree(reserve_space_ref));
   CUDNNXX_CUDA_CHECK(cudaFree(states_ref));

@@ -89,7 +89,25 @@ class RNN {
   // cudnnRNNForwardTrainingEx
   // cudnnRNNForwardInferenceEx
 
-  // cudnnRNNBackwardData
+  void BackwardData(const Handle& handle, int seq_length,
+                    const TensorArray<TensorT>& y,
+                    const TensorArray<TensorT>& dy, const Tensor<TensorT>& dhy,
+                    const Tensor<TensorT>& dcy, const Filter<TensorT>& w,
+                    const Tensor<TensorT>& hx, const Tensor<TensorT>& cx,
+                    TensorArray<TensorT>* dx, Tensor<TensorT>* dhx,
+                    Tensor<TensorT>* dcx, void* workspace,
+                    size_t workspace_size_in_bytes, void* reserve_space,
+                    size_t reserve_space_size_in_bytes) {
+    CUDNNXX_DNN_CHECK(cudnnRNNBackwardData(
+        handle.raw_handle(), desc_, seq_length, y.descs(), y.dev_mem(),
+        dy.descs(), dy.dev_mem(), dhy.desc(), dhy.dev_mem(), dcy.desc(),
+        dcy.dev_mem(), w.desc(), w.dev_mem(), hx.desc(), hx.dev_mem(),
+        cx.desc(), cx.dev_mem(), dx->descs(), dx->dev_mem(), dhx->desc(),
+        dhx->dev_mem(), dcx->desc(), dcx->dev_mem(), workspace,
+        workspace_size_in_bytes, reserve_space, reserve_space_size_in_bytes));
+  }
+
+  // TODO:
   // cudnnRNNBackwardWeights
 
   // cudnnCreatePersistentRNNPlan

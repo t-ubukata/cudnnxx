@@ -14,7 +14,7 @@ namespace cudnnxx {
 template <typename TensorT, typename FactorT>
 class RNN {
  public:
-  RNN(const Handle& handle, int hidden_size, int num_layers,
+  RNN(const Handle& handle, int hidden_n_elem, int num_layers,
       const Dropout<TensorT>& dropout, cudnnRNNInputMode_t input_mode,
       cudnnDirectionMode_t direction, cudnnRNNMode_t mode, cudnnRNNAlgo_t algo,
       cudnnDataType_t dtype) {
@@ -22,7 +22,7 @@ class RNN {
     // NOTE: cuDNN documentation is wrong.
     //       This function takes 10 arguments in fact.
     CUDNNXX_DNN_CHECK(cudnnSetRNNDescriptor_v6(
-        handle.raw_handle(), desc_, hidden_size, num_layers, dropout.desc(),
+        handle.raw_handle(), desc_, hidden_n_elem, num_layers, dropout.desc(),
         input_mode, direction, mode, algo, dtype));
   }
 

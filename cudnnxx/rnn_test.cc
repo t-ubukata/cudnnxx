@@ -10,12 +10,13 @@ namespace cudnnxx {
 
 class RNNTest : public ::testing::Test {
  protected:
-  Handle handle;
+  const Handle handle;
+  const float dropout_p = 0.5;
+  const unsigned long long seed = 20200627;
+  const cudnnDataType_t dtype = CUDNN_DATA_FLOAT;
 };
 
 TEST_F(RNNTest, TestConstructor) {
-  float dropout_p = 0.5;
-  unsigned long long seed = 20200627;
   Dropout<float> dropout(handle, dropout_p, seed);
   RNN<float, float> rnn(handle, 1, 1, dropout, CUDNN_LINEAR_INPUT,
                         CUDNN_UNIDIRECTIONAL, CUDNN_RNN_RELU,
@@ -23,27 +24,25 @@ TEST_F(RNNTest, TestConstructor) {
 }
 
 TEST_F(RNNTest, TestGetParamSize) {
-  float dropout_p = 0.5;
-  unsigned long long seed = 20200627;
   Dropout<float> dropout(handle, dropout_p, seed);
-  auto dtype = CUDNN_DATA_FLOAT;
   RNN<float, float> rnn(handle, 1, 1, dropout, CUDNN_LINEAR_INPUT,
                         CUDNN_UNIDIRECTIONAL, CUDNN_RNN_RELU,
                         CUDNN_RNN_ALGO_STANDARD, dtype);
 
   constexpr int n_dims = 3;
-  constexpr int batch_size = 2;
-  constexpr int input_size = 3;
-  int dims[n_dims] = {batch_size, input_size, 1};
+  constexpr int batch_n_elem = 2;
+  constexpr int input_n_elem = 3;
+  int dims[n_dims] = {batch_n_elem, input_n_elem, 1};
   int strides[n_dims] = {dims[2] * dims[1], dims[2], 1};
   constexpr int seq_length = 3;
-  constexpr int n_elem = seq_length * input_size * batch_size;
+  constexpr int n_elem = seq_length * input_n_elem * batch_n_elem;
 
   float x_host[n_elem] = {};
   float* x_dev = nullptr;
-  size_t x_size = sizeof(float) * n_elem;
-  CUDNNXX_CUDA_CHECK(cudaMalloc(&x_dev, x_size));
-  CUDNNXX_CUDA_CHECK(cudaMemcpy(x_dev, x_host, x_size, cudaMemcpyHostToDevice));
+  size_t x_size_in_bytes = sizeof(float) * n_elem;
+  CUDNNXX_CUDA_CHECK(cudaMalloc(&x_dev, x_size_in_bytes));
+  CUDNNXX_CUDA_CHECK(
+      cudaMemcpy(x_dev, x_host, x_size_in_bytes, cudaMemcpyHostToDevice));
   TensorArray<float> x_tensors(dtype, n_dims, dims, strides, x_dev, seq_length);
 
   auto size_in_bytes = rnn.GetParamsSize(handle, x_tensors, dtype);
@@ -58,90 +57,85 @@ TEST_F(RNNTest, TestGetParamSize) {
 }
 
 TEST_F(RNNTest, TestGetTrainingReserveSize) {
-  float dropout_p = 0.5;
-  unsigned long long seed = 20200627;
   Dropout<float> dropout(handle, dropout_p, seed);
-  auto dtype = CUDNN_DATA_FLOAT;
   RNN<float, float> rnn(handle, 1, 1, dropout, CUDNN_LINEAR_INPUT,
                         CUDNN_UNIDIRECTIONAL, CUDNN_RNN_RELU,
                         CUDNN_RNN_ALGO_STANDARD, dtype);
 
   constexpr int n_dims = 3;
-  constexpr int batch_size = 2;
-  constexpr int input_size = 3;
-  int dims[n_dims] = {batch_size, input_size, 1};
+  constexpr int batch_n_elem = 2;
+  constexpr int input_n_elem = 3;
+  int dims[n_dims] = {batch_n_elem, input_n_elem, 1};
   int strides[n_dims] = {dims[2] * dims[1], dims[2], 1};
   constexpr int seq_length = 3;
-  constexpr int n_elem = seq_length * input_size * batch_size;
+  constexpr int n_elem = seq_length * input_n_elem * batch_n_elem;
 
   float x_host[n_elem] = {};
   float* x_dev = nullptr;
-  size_t x_size = sizeof(float) * n_elem;
-  CUDNNXX_CUDA_CHECK(cudaMalloc(&x_dev, x_size));
-  CUDNNXX_CUDA_CHECK(cudaMemcpy(x_dev, x_host, x_size, cudaMemcpyHostToDevice));
+  size_t x_size_in_bytes = sizeof(float) * n_elem;
+  CUDNNXX_CUDA_CHECK(cudaMalloc(&x_dev, x_size_in_bytes));
+  CUDNNXX_CUDA_CHECK(
+      cudaMemcpy(x_dev, x_host, x_size_in_bytes, cudaMemcpyHostToDevice));
   TensorArray<float> x_tensors(dtype, n_dims, dims, strides, x_dev, seq_length);
 
-  auto reserve_size = rnn.GetTrainingReserveSize(handle, seq_length, x_tensors);
+  auto reserve_size_in_bytes =
+      rnn.GetTrainingReserveSize(handle, seq_length, x_tensors);
 
-  size_t reserve_size_ref = 0;
+  size_t reserve_size_in_bytes_ref = 0;
   CUDNNXX_DNN_CHECK(cudnnGetRNNTrainingReserveSize(
       handle.raw_handle(), rnn.desc(), seq_length, x_tensors.descs(),
-      &reserve_size_ref));
+      &reserve_size_in_bytes_ref));
 
-  EXPECT_EQ(reserve_size_ref, reserve_size);
+  EXPECT_EQ(reserve_size_in_bytes_ref, reserve_size_in_bytes);
   CUDNNXX_CUDA_CHECK(cudaFree(x_dev));
 }
 
 TEST_F(RNNTest, TestGetRNNWorkspaceSize) {
-  float dropout_p = 0.5;
-  unsigned long long seed = 20200627;
   Dropout<float> dropout(handle, dropout_p, seed);
-  auto dtype = CUDNN_DATA_FLOAT;
   RNN<float, float> rnn(handle, 1, 1, dropout, CUDNN_LINEAR_INPUT,
                         CUDNN_UNIDIRECTIONAL, CUDNN_RNN_RELU,
                         CUDNN_RNN_ALGO_STANDARD, dtype);
 
   constexpr int n_dims = 3;
-  constexpr int batch_size = 2;
-  constexpr int input_size = 3;
-  int dims[n_dims] = {batch_size, input_size, 1};
+  constexpr int batch_n_elem = 2;
+  constexpr int input_n_elem = 3;
+  int dims[n_dims] = {batch_n_elem, input_n_elem, 1};
   int strides[n_dims] = {dims[2] * dims[1], dims[2], 1};
   constexpr int seq_length = 3;
-  constexpr int n_elem = seq_length * input_size * batch_size;
+  constexpr int n_elem = seq_length * input_n_elem * batch_n_elem;
 
   float x_host[n_elem] = {};
   float* x_dev = nullptr;
-  size_t x_size = sizeof(float) * n_elem;
-  CUDNNXX_CUDA_CHECK(cudaMalloc(&x_dev, x_size));
-  CUDNNXX_CUDA_CHECK(cudaMemcpy(x_dev, x_host, x_size, cudaMemcpyHostToDevice));
+  size_t x_size_in_bytes = sizeof(float) * n_elem;
+  CUDNNXX_CUDA_CHECK(cudaMalloc(&x_dev, x_size_in_bytes));
+  CUDNNXX_CUDA_CHECK(
+      cudaMemcpy(x_dev, x_host, x_size_in_bytes, cudaMemcpyHostToDevice));
   TensorArray<float> x_tensors(dtype, n_dims, dims, strides, x_dev, seq_length);
 
-  auto workspace_size = rnn.GetWorkspaceSize(handle, seq_length, x_tensors);
+  auto workspace_size_in_bytes =
+      rnn.GetWorkspaceSize(handle, seq_length, x_tensors);
 
-  size_t workspace_size_ref = 0;
+  size_t workspace_size_in_bytes_ref = 0;
   CUDNNXX_DNN_CHECK(cudnnGetRNNWorkspaceSize(handle.raw_handle(), rnn.desc(),
                                              seq_length, x_tensors.descs(),
-                                             &workspace_size_ref));
+                                             &workspace_size_in_bytes_ref));
 
-  EXPECT_EQ(workspace_size_ref, workspace_size);
+  EXPECT_EQ(workspace_size_in_bytes_ref, workspace_size_in_bytes);
   CUDNNXX_CUDA_CHECK(cudaFree(x_dev));
 }
 
 TEST_F(RNNTest, TestForwardTraining) {
-  float rnn_dropout_p = 0.5;
-  unsigned long long rnn_seed = 20201102;
-  Dropout<float> rnn_dropout(handle, rnn_dropout_p, rnn_seed);
-  auto dtype = CUDNN_DATA_FLOAT;
-  int input_size = 3;
-  int hidden_size = input_size;
+  Dropout<float> dropout(handle, dropout_p, seed);
+  int input_n_elem = 3;
+  int hidden_n_elem = input_n_elem;
   int n_layers = 1;
-  RNN<float, float> rnn(handle, hidden_size, n_layers, rnn_dropout,
+  RNN<float, float> rnn(handle, hidden_n_elem, n_layers, dropout,
                         CUDNN_LINEAR_INPUT, CUDNN_UNIDIRECTIONAL,
                         CUDNN_RNN_RELU, CUDNN_RNN_ALGO_STANDARD, dtype);
 
   int n_dims = 3;
-  int batch_size = 2;
-  std::vector<int> dims_1 = {batch_size, input_size, 1};
+  int batch_n_elem = 2;
+  std::vector<int> dims_1 = {batch_n_elem, input_n_elem, 1};
   std::vector<int> strides_1 = {dims_1[2] * dims_1[1], dims_1[2], 1};
   int seq_length = 3;
   int n_elem_1 = dims_1[0] * dims_1[1] * dims_1[2] * seq_length;
@@ -163,7 +157,7 @@ TEST_F(RNNTest, TestForwardTraining) {
   TensorArray<float> y_tensors(dtype, n_dims, dims_1.data(), strides_1.data(),
                                y_dev, seq_length);
 
-  std::vector<int> dims_2 = {n_layers, batch_size, hidden_size};
+  std::vector<int> dims_2 = {n_layers, batch_n_elem, hidden_n_elem};
   std::vector<int> strides_2 = {dims_2[2] * dims_2[1], dims_2[2], 1};
   int n_elem_2 = dims_2[0] * dims_2[1] * dims_2[2];
   size_t size_in_bytes_2 = sizeof(float) * n_elem_2;

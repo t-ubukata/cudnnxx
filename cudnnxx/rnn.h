@@ -107,9 +107,20 @@ class RNN {
         workspace_size_in_bytes, reserve_space, reserve_space_size_in_bytes));
   }
 
-  // TODO:
-  // cudnnRNNBackwardWeights
+  void BackwardWeights(const Handle& handle, int seq_length,
+                       const TensorArray<TensorT>& x, const Tensor<TensorT>& hx,
+                       const TensorArray<TensorT>& y, void* workspace,
+                       size_t workspace_size_in_bytes,
+                       const Filter<TensorT>* dw, void* reserve_space,
+                       size_t reserve_space_size_in_bytes) {
+    CUDNNXX_DNN_CHECK(cudnnRNNBackwardWeights(
+        handle.raw_handle(), desc_, seq_length, x.descs(), x.dev_mem(),
+        hx.desc(), hx.dev_mem(), y.descs(), y.dev_mem(), workspace,
+        workspace_size_in_bytes, dw->desc(), dw->dev_mem(), reserve_space,
+        reserve_space_size_in_bytes));
+  }
 
+  // TODO:
   // cudnnCreatePersistentRNNPlan
   // cudnnDestroyPersistentRNNPlan
   // cudnnSetPersistentRNNPlan

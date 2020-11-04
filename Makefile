@@ -33,6 +33,8 @@ $(OBJ_DIR)/dropout_test.o: $(SRC_DIR)/dropout_test.cc
 	$(CXX) $^ $(CXXFLAGS) -c -o $@
 $(OBJ_DIR)/rnn_test.o: $(SRC_DIR)/rnn_test.cc
 	$(CXX) $^ $(CXXFLAGS) -c -o $@
+$(OBJ_DIR)/divisive_normalization_test.o: $(SRC_DIR)/divisive_normalization_test.cc
+	$(CXX) $^ $(CXXFLAGS) -c -o $@
 $(OBJ_DIR)/example_test.o: $(SRC_DIR)/example_test.cc
 	$(CXX) $^ $(CXXFLAGS) -c -o $@
 
@@ -44,6 +46,7 @@ TEST_OBJS := $(OBJ_DIR)/common_test.o \
              $(OBJ_DIR)/pooling_test.o \
              $(OBJ_DIR)/dropout_test.o \
              $(OBJ_DIR)/rnn_test.o \
+             $(OBJ_DIR)/divisive_normalization_test.o \
              $(OBJ_DIR)/example_test.o
 
 # Google Test.

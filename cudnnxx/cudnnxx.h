@@ -10,7 +10,6 @@
 
 // TODO(t-ubukata):
 // Op
-//   divisive_normalization
 //   CTCLoss
 //   Algorithm
 //   AlgorithmPerformance

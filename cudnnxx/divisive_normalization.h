@@ -43,6 +43,16 @@ class DivisiveNormalization {
         y->dev_mem()));
   }
 
+  void Backward(const Handle& handle, FactorT alpha, const Tensor<TensorT>& x,
+                const Tensor<TensorT>& means, const Tensor<TensorT>& dy,
+                const Tensor<TensorT>& temp, const Tensor<TensorT>& temp2,
+                FactorT beta, Tensor<TensorT>* dx, Tensor<TensorT>* d_means) {
+    CUDNNXX_DNN_CHECK(cudnnDivisiveNormalizationBackward(
+        handle.raw_handle(), desc_, mode_, &alpha, x.desc(), x.dev_mem(),
+        means.dev_mem(), dy.dev_mem(), temp.dev_mem(), temp2.dev_mem(), &beta,
+        dx->desc(), dx->dev_mem(), d_means->dev_mem()));
+  }
+
  private:
   cudnnLRNDescriptor_t desc_;
   cudnnDivNormMode_t mode_ = CUDNN_DIVNORM_PRECOMPUTED_MEANS;

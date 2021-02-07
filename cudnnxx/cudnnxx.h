@@ -13,7 +13,7 @@
 #include "cudnnxx/rnn.h"
 #include "cudnnxx/util.h"
 
-// TODO(t-ubukata):
+// TODO:
 // Op
 //   Algorithm
 //   AlgorithmPerformance

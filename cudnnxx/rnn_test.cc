@@ -18,16 +18,16 @@ class RNNTest : public ::testing::Test {
 
 TEST_F(RNNTest, TestConstructor) {
   Dropout<float> dropout(handle, dropout_p, seed);
-  RNN<float, float> rnn(handle, 1, 1, dropout, CUDNN_LINEAR_INPUT,
-                        CUDNN_UNIDIRECTIONAL, CUDNN_RNN_RELU,
-                        CUDNN_RNN_ALGO_STANDARD, CUDNN_DATA_FLOAT);
+  RNN<float> rnn(handle, 1, 1, dropout, CUDNN_LINEAR_INPUT,
+                 CUDNN_UNIDIRECTIONAL, CUDNN_RNN_RELU, CUDNN_RNN_ALGO_STANDARD,
+                 CUDNN_DATA_FLOAT);
 }
 
 TEST_F(RNNTest, TestGetParamSize) {
   Dropout<float> dropout(handle, dropout_p, seed);
-  RNN<float, float> rnn(handle, 1, 1, dropout, CUDNN_LINEAR_INPUT,
-                        CUDNN_UNIDIRECTIONAL, CUDNN_RNN_RELU,
-                        CUDNN_RNN_ALGO_STANDARD, dtype);
+  RNN<float> rnn(handle, 1, 1, dropout, CUDNN_LINEAR_INPUT,
+                 CUDNN_UNIDIRECTIONAL, CUDNN_RNN_RELU, CUDNN_RNN_ALGO_STANDARD,
+                 dtype);
 
   constexpr int n_dims = 3;
   constexpr int batch_n_elem = 2;
@@ -58,9 +58,9 @@ TEST_F(RNNTest, TestGetParamSize) {
 
 TEST_F(RNNTest, TestGetTrainingReserveSize) {
   Dropout<float> dropout(handle, dropout_p, seed);
-  RNN<float, float> rnn(handle, 1, 1, dropout, CUDNN_LINEAR_INPUT,
-                        CUDNN_UNIDIRECTIONAL, CUDNN_RNN_RELU,
-                        CUDNN_RNN_ALGO_STANDARD, dtype);
+  RNN<float> rnn(handle, 1, 1, dropout, CUDNN_LINEAR_INPUT,
+                 CUDNN_UNIDIRECTIONAL, CUDNN_RNN_RELU, CUDNN_RNN_ALGO_STANDARD,
+                 dtype);
 
   constexpr int n_dims = 3;
   constexpr int batch_n_elem = 2;
@@ -92,9 +92,9 @@ TEST_F(RNNTest, TestGetTrainingReserveSize) {
 
 TEST_F(RNNTest, TestGetRNNWorkspaceSize) {
   Dropout<float> dropout(handle, dropout_p, seed);
-  RNN<float, float> rnn(handle, 1, 1, dropout, CUDNN_LINEAR_INPUT,
-                        CUDNN_UNIDIRECTIONAL, CUDNN_RNN_RELU,
-                        CUDNN_RNN_ALGO_STANDARD, dtype);
+  RNN<float> rnn(handle, 1, 1, dropout, CUDNN_LINEAR_INPUT,
+                 CUDNN_UNIDIRECTIONAL, CUDNN_RNN_RELU, CUDNN_RNN_ALGO_STANDARD,
+                 dtype);
 
   constexpr int n_dims = 3;
   constexpr int batch_n_elem = 2;
@@ -129,9 +129,9 @@ TEST_F(RNNTest, TestForwardTraining) {
   int input_n_elem = 3;
   int hidden_n_elem = input_n_elem;
   int n_layers = 1;
-  RNN<float, float> rnn(handle, hidden_n_elem, n_layers, dropout,
-                        CUDNN_LINEAR_INPUT, CUDNN_UNIDIRECTIONAL,
-                        CUDNN_RNN_RELU, CUDNN_RNN_ALGO_STANDARD, dtype);
+  RNN<float> rnn(handle, hidden_n_elem, n_layers, dropout, CUDNN_LINEAR_INPUT,
+                 CUDNN_UNIDIRECTIONAL, CUDNN_RNN_RELU, CUDNN_RNN_ALGO_STANDARD,
+                 dtype);
 
   int n_dims = 3;
   int batch_n_elem = 2;
@@ -305,9 +305,9 @@ TEST_F(RNNTest, TestForwardInference) {
   int input_n_elem = 3;
   int hidden_n_elem = input_n_elem;
   int n_layers = 1;
-  RNN<float, float> rnn(handle, hidden_n_elem, n_layers, dropout,
-                        CUDNN_LINEAR_INPUT, CUDNN_UNIDIRECTIONAL,
-                        CUDNN_RNN_RELU, CUDNN_RNN_ALGO_STANDARD, dtype);
+  RNN<float> rnn(handle, hidden_n_elem, n_layers, dropout, CUDNN_LINEAR_INPUT,
+                 CUDNN_UNIDIRECTIONAL, CUDNN_RNN_RELU, CUDNN_RNN_ALGO_STANDARD,
+                 dtype);
 
   int n_dims = 3;
   int batch_n_elem = 2;
@@ -472,9 +472,9 @@ TEST_F(RNNTest, TestBackwardData) {
   int input_n_elem = 3;
   int hidden_n_elem = input_n_elem;
   int n_layers = 1;
-  RNN<float, float> rnn(handle, hidden_n_elem, n_layers, dropout,
-                        CUDNN_LINEAR_INPUT, CUDNN_UNIDIRECTIONAL,
-                        CUDNN_RNN_RELU, CUDNN_RNN_ALGO_STANDARD, dtype);
+  RNN<float> rnn(handle, hidden_n_elem, n_layers, dropout, CUDNN_LINEAR_INPUT,
+                 CUDNN_UNIDIRECTIONAL, CUDNN_RNN_RELU, CUDNN_RNN_ALGO_STANDARD,
+                 dtype);
 
   int n_dims = 3;
   int batch_n_elem = 2;
@@ -743,9 +743,9 @@ TEST_F(RNNTest, TestBackwardWeights) {
   int input_n_elem = 3;
   int hidden_n_elem = input_n_elem;
   int n_layers = 1;
-  RNN<float, float> rnn(handle, hidden_n_elem, n_layers, dropout,
-                        CUDNN_LINEAR_INPUT, CUDNN_UNIDIRECTIONAL,
-                        CUDNN_RNN_RELU, CUDNN_RNN_ALGO_STANDARD, dtype);
+  RNN<float> rnn(handle, hidden_n_elem, n_layers, dropout, CUDNN_LINEAR_INPUT,
+                 CUDNN_UNIDIRECTIONAL, CUDNN_RNN_RELU, CUDNN_RNN_ALGO_STANDARD,
+                 dtype);
 
   int n_dims = 3;
   int batch_n_elem = 2;

@@ -148,7 +148,7 @@ TEST_F(ConvolutionTest, TestGet2dForwardOutputDim) {
   EXPECT_EQ(1, w) << "w does not match.";
 }
 
-// TODO(t-ubukata): Test Nd.
+// TODO: Test Nd.
 
 TEST_F(ConvolutionTest, TestForward) {
   Convolution<float, float> conv(0, 0, 1, 2, 1, 1, CUDNN_CONVOLUTION,

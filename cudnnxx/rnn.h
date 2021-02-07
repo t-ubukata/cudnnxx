@@ -10,8 +10,7 @@
 
 namespace cudnnxx {
 
-// FactorT must be float or double.
-template <typename TensorT, typename FactorT>
+template <typename TensorT>
 class RNN {
  public:
   RNN(const Handle& handle, int hidden_n_elem, int num_layers,

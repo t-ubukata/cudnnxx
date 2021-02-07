@@ -9,7 +9,8 @@
 
 namespace cudnnxx {
 
-template <typename TensorT, typename FactorT>
+// TODO: Consider to implement as one function.
+template <typename TensorT>
 class CTCLoss {
  public:
   CTCLoss(cudnnDataType_t comp_type) {
@@ -43,7 +44,17 @@ class CTCLoss {
     return size_in_bytes;
   }
 
-  // cudnnCTCLoss()
+  void Compute(const Handle& handle, const Tensor<TensorT>& probs, int* labels,
+               int* label_lengths, int* input_lengths, void* costs,
+               Tensor<TensorT>* gradients, cudnnCTCLossAlgo_t algo,
+               void* workspace, size_t workspace_size_in_bytes) {
+    // cuDNN documentation says workSpaceSizeInBytes is type of size_t*,
+    // but actually size_t.
+    CUDNNXX_DNN_CHECK(cudnnCTCLoss(
+        handle.raw_handle(), probs.desc(), probs.dev_mem(), labels,
+        label_lengths, input_lengths, costs, gradients->desc(),
+        gradients->dev_mem(), algo, desc_, workspace, workspace_size_in_bytes));
+  }
 
  private:
   cudnnCTCLossDescriptor_t desc_;

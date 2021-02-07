@@ -1,6 +1,6 @@
 CUDA_DIR := /usr/local/cuda
 GTEST_DIR := ./external/googletest
-CXXFLAGS := -g -std=c++11 -Wall -Wextra -Werror -pedantic -pedantic-errors \
+CXXFLAGS := -g -std=c++14 -Wall -Wextra -Werror -pedantic -pedantic-errors \
             -fno-exceptions -I. \
             -I$(CUDA_DIR)/include -I$(GTEST_DIR)/googletest/include
 OBJ_DIR := ./obj

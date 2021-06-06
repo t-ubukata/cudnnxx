@@ -5,16 +5,15 @@ cuDNN C++ wrapper.
 ## Features
 
 - Header only.
-- Only includes host codes.
-- Written in C++11.
-- Mainly focused on RAII.
+- Descriptors are automatically destroyed via RAII.
 
 ## Requirements
 
-- x86_64 Linux. (Tested on Ubuntu 16.04 LTS)
-- gcc or Clang (Tested on Clang 3.8.0)
-- CUDA Toolkit 9.1 or later.
-- cuDNN 7.1.2 or later.
+- x86_64 Linux. (Tested on Ubuntu 20.04 LTS)
+- C++14 compliant compiler (Tested on GCC 9.3)
+- CUDA Toolkit 11.0 or later.
+- cuDNN 7.6.5 or later.
+- GoogleTest 1.10.0 or later.
 
 ## Build and test
 
@@ -24,5 +23,5 @@ make
 
 ## Usage
 
-Include cudnnxx/cudnnxx.h.
+Include cudnnxx/cudnnxx.h.  
 See cudnnxx/example_test.cc for more information.

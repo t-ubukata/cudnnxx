@@ -1,10 +1,9 @@
 CUDA_DIR := /usr/local/cuda
-GTEST_DIR := ./external/googletest
 CXXFLAGS := -g -std=c++14 -Wall -Wextra -Werror -pedantic -pedantic-errors \
-            -fno-exceptions -I. \
-            -I$(CUDA_DIR)/include -I$(GTEST_DIR)/googletest/include
+            -fno-exceptions -I. -I$(CUDA_DIR)/include
 OBJ_DIR := ./obj
-LDFLAGS := -L$(CUDA_DIR)/lib64 -lpthread -lcuda -lcudart -lcudnn
+LDFLAGS := -L$(CUDA_DIR)/lib64 -lcuda -lcudart -lcudnn -lgtest -lgtest_main \
+           -lpthread
 
 SRC_DIR := ./cudnnxx
 
@@ -13,8 +12,8 @@ SRC_DIR := ./cudnnxx
 TEST_BIN_DIR := ./test_bin
 
 # Runs tets.
-test: $(TEST_BIN_DIR)/gtest_main
-	./test_bin/gtest_main
+test: $(TEST_BIN_DIR)/test_main
+	./test_bin/test_main
 
 # Test object files.
 $(OBJ_DIR)/common_test.o: $(SRC_DIR)/common_test.cc
@@ -52,23 +51,12 @@ TEST_OBJS := $(OBJ_DIR)/common_test.o \
              $(OBJ_DIR)/ctc_loss_test.o \
              $(OBJ_DIR)/example_test.o
 
-# Google Test.
-GTEST_TARGET := $(GTEST_DIR)/googletest/libgtest_main.a
-
-$(GTEST_TARGET):
-	(cd $(GTEST_DIR)/googletest && CC=$(CC) CXX=$(CXX) cmake CMakeLists.txt && make)
-
 # The test main.
-$(TEST_BIN_DIR)/gtest_main: $(OBJS) $(TEST_OBJS) $(GTEST_TARGET)
-	$(CXX) $^ $(GTEST_DIR)/googletest/libgtest.a $(LDFLAGS) -o $@
+$(TEST_BIN_DIR)/test_main: $(OBJS) $(TEST_OBJS) $(GTEST_TARGET)
+	$(CXX) $^ $(LDFLAGS) -o $@
 
 format:
 	clang-format -i -style=Google cudnnxx/*
 
 clean:
 	$(RM) $(OBJ_DIR)/* $(TARGET_LIB) $(TEST_BIN_DIR)/* \
-	$(GTEST_DIR)/googletest/libgtest.a $(GTEST_DIR)/googletest/libgtest_main.a \
-	$(GTEST_DIR)/googletest/CMakeCache.txt $(GTEST_DIR)/googletest/cmake_install.cmake \
-	$(GTEST_DIR)/googletest/Makefile $(GTEST_DIR)/CMakeCache.txt \
-	$(GTEST_DIR)/googlemock/libgmock.a $(GTEST_DIR)/googlemock/libgmock_main.a \
-	&& $(RM) -r $(GTEST_DIR)/googletest/CMakeFiles \

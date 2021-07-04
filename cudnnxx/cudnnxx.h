@@ -15,8 +15,7 @@
 
 // TODO:
 // Op
-//   Algorithm
-//   AlgorithmPerformance
-//   SpatialTransformer
+//   Algorithm (Deprecated in 8)
+//   AlgorithmPerformance (Deprecated in 8)
 
 #endif  // CUDNNXX_CUDNNXX_H_

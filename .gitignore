@@ -31,4 +31,4 @@
 *.out
 *.app
 
-test_bin/test_main
+build

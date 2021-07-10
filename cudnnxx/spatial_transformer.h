@@ -12,8 +12,8 @@ class SpatialTransformer {
  public:
   SpatialTransformer(cudnnDataType_t dtype, int n_dims, int dims[]) {
     CUDNNXX_DNN_CHECK(cudnnCreateSpatialTransformerDescriptor(&desc_));
-    CUDNNXX_DNN_CHECK(cudnnSetSpatialTransformerNdDescriptor(desc_,
-                      CUDNN_SAMPLER_BILINEAR, dtype, n_dims, dims));
+    CUDNNXX_DNN_CHECK(cudnnSetSpatialTransformerNdDescriptor(
+        desc_, CUDNN_SAMPLER_BILINEAR, dtype, n_dims, dims));
   }
 
   ~SpatialTransformer() {
@@ -25,15 +25,19 @@ class SpatialTransformer {
 
   cudnnSpatialTransformerDescriptor_t desc() const { return desc_; }
 
- private:
-  cudnnSpatialTransformerDescriptor_t  desc_;
-};
+  void GridGeneratorForkward(const Handle& handle, void* theta, void* grid) {
+    CUDNNXX_DNN_CHECK(cudnnSpatialTfGridGeneratorForward(handle.raw_handle(),
+                                                         desc_, theta, grid));
+  }
 
-// TODO:
-// cudnnSpatialTfGridGeneratorBackward
-// cudnnSpatialTfGridGeneratorForward
-// cudnnSpatialTfGridGeneratorForward
-// cudnnSpatialTfSamplerForward
+  // TODO:
+  // cudnnSpatialTfGridGeneratorForward
+  // cudnnSpatialTfSamplerForward
+  // cudnnSpatialTfSamplerBackward
+
+ private:
+  cudnnSpatialTransformerDescriptor_t desc_;
+};
 
 }  // namespace cudnnxx
 

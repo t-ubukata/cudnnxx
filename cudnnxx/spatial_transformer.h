@@ -25,13 +25,18 @@ class SpatialTransformer {
 
   cudnnSpatialTransformerDescriptor_t desc() const { return desc_; }
 
-  void GridGeneratorForkward(const Handle& handle, void* theta, void* grid) {
+  void GridGeneratorForward(const Handle& handle, void* theta, void* grid) {
     CUDNNXX_DNN_CHECK(cudnnSpatialTfGridGeneratorForward(handle.raw_handle(),
                                                          desc_, theta, grid));
   }
 
+  void GridGeneratorBackward(const Handle& handle, const void* dgrid,
+                             void* dtheta) {
+    CUDNNXX_DNN_CHECK(cudnnSpatialTfGridGeneratorBackward(
+        handle.raw_handle(), desc_, dgrid, dtheta));
+  }
+
   // TODO:
-  // cudnnSpatialTfGridGeneratorForward
   // cudnnSpatialTfSamplerForward
   // cudnnSpatialTfSamplerBackward
 

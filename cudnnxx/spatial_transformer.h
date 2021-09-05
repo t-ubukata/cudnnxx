@@ -1,5 +1,5 @@
-#ifndef CUDNNXX_ALGORITHM_H_
-#define CUDNNXX_ALGORITHM_H_
+#ifndef CUDNNXX_SPATIAL_TRANSFORMER_H_
+#define CUDNNXX_SPATIAL_TRANSFORMER_H_
 
 #include "cudnn.h"
 #include "cudnnxx/common.h"
@@ -46,4 +46,4 @@ class SpatialTransformer {
 
 }  // namespace cudnnxx
 
-#endif  // CUDNNXX_ALGORITHM_H_
+#endif  // CUDNNXX_SPATIAL_TRANSFORMER_H_

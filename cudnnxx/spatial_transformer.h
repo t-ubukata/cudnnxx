@@ -36,8 +36,15 @@ class SpatialTransformer {
         handle.raw_handle(), desc_, dgrid, dtheta));
   }
 
+  void SamplerForward(const Handle& handle, FactorT alpha,
+                      const Tensor<TensorT>& x, const void* grid, FactorT beta,
+                      Tensor<TensorT>* y) const {
+    CUDNNXX_DNN_CHECK(cudnnSpatialTfSamplerForward(
+        handle.raw_handle(), desc_, &alpha, x.desc(), x.dev_mem(), grid, &beta,
+        y->desc(), y->dev_mem()));
+  }
+
   // TODO:
-  // cudnnSpatialTfSamplerForward
   // cudnnSpatialTfSamplerBackward
 
  private:

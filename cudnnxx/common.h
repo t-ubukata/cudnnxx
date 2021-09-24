@@ -28,6 +28,7 @@ class Handle {
 template <typename T>
 class Tensor {
  public:
+  // 4d
   Tensor(cudnnDataType_t dtype, cudnnTensorFormat_t format, int n, int c, int h,
          int w, T* dev_mem)
       : dev_mem_(dev_mem) {
@@ -36,6 +37,7 @@ class Tensor {
         cudnnSetTensor4dDescriptor(desc_, format, dtype, n, c, h, w));
   }
 
+  // 4d with strides.
   Tensor(cudnnDataType_t dtype, int n, int c, int h, int w, int n_stride,
          int c_stride, int h_stride, int w_stride, T* dev_mem)
       : dev_mem_(dev_mem) {
@@ -44,6 +46,7 @@ class Tensor {
         desc_, dtype, n, c, h, w, n_stride, c_stride, h_stride, w_stride));
   }
 
+  // Nd with strides.
   Tensor(cudnnDataType_t dtype, int n_dims, int dims[], int strides[],
          T* dev_mem)
       : dev_mem_(dev_mem) {
@@ -52,6 +55,7 @@ class Tensor {
         cudnnSetTensorNdDescriptor(desc_, dtype, n_dims, dims, strides));
   }
 
+  // Nd with format.
   Tensor(cudnnTensorFormat_t format, cudnnDataType_t dtype, int n_dims,
          int dims[], T* dev_mem)
       : dev_mem_(dev_mem) {
@@ -83,6 +87,7 @@ class Tensor {
 template <typename T>
 class Filter {
  public:
+  // 4d
   Filter(cudnnDataType_t dtype, cudnnTensorFormat_t format, int k, int c, int h,
          int w, T* dev_mem)
       : dev_mem_(dev_mem) {
@@ -91,6 +96,7 @@ class Filter {
         cudnnSetFilter4dDescriptor(desc_, dtype, format, k, c, h, w));
   }
 
+  // Nd
   Filter(cudnnDataType_t dtype, cudnnTensorFormat_t format, int n_dims,
          int dims[], T* dev_mem)
       : dev_mem_(dev_mem) {

@@ -166,7 +166,7 @@ TEST_F(SpatialTransformerTest, TestSamplerForward) {
       cudaMemcpy(x_dev, x_host, tensor_n_bytes, cudaMemcpyHostToDevice));
   Tensor<float> x(CUDNN_DATA_FLOAT, CUDNN_TENSOR_NCHW, n, c, h, w, x_dev);
 
-  float beta = 0;
+  float beta = 1;
 
   float* y_dev = nullptr;
   CUDNNXX_CUDA_CHECK(cudaMalloc(&y_dev, tensor_n_bytes));

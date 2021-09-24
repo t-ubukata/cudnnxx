@@ -57,22 +57,22 @@ TEST_F(PoolingTest, TestGet2dForwardOutputDim) {
   CUDNNXX_CUDA_CHECK(cudaFree(x_dev));
 }
 
-// TODO: cudnnGetPoolingNdForwardOutputDim returns CUDNN_STATUS_BAD_PARAM.
-TEST_F(PoolingTest, DISABLED_TestGetNdForwardOutputDim) {
-  constexpr int n_dims = 5;
-  int window_dims[n_dims] = {1, 1, 2, 2, 2};
-  int paddings[n_dims] = {1, 1, 1, 1, 1};
-  int strides[n_dims] = {1, 1, 2, 2, 2};
+TEST_F(PoolingTest, TestGetNdForwardOutputDim) {
+  constexpr int n_pooling_dims = 3;
+  int window_dims[n_pooling_dims] = {2, 2, 2};
+  int paddings[n_pooling_dims] = {1, 1, 1};
+  int pooling_strides[n_pooling_dims] = {2, 2, 2};
   Pooling<float, float> pool(CUDNN_POOLING_MAX_DETERMINISTIC,
-                             CUDNN_PROPAGATE_NAN, n_dims, window_dims, paddings,
-                             strides);
+                             CUDNN_PROPAGATE_NAN, n_pooling_dims, window_dims, paddings,
+                             pooling_strides);
   constexpr int x_n = 32;
   constexpr int x_c = 3;
   constexpr int x_h = 8;
   constexpr int x_w = 8;
   constexpr int x_d = 8;  // depth
+  constexpr int n_x_dims = 5;
   constexpr int n_x_elem = x_n * x_c * x_h * x_w * x_d;
-  int dims[] = {x_n, x_c, x_h, x_w, x_d};
+  int dims[n_x_dims] = {x_n, x_c, x_h, x_w, x_d};
   size_t x_size = sizeof(float) * n_x_elem;
   float x_host[n_x_elem] = {};
   for (int i = 0; i < n_x_elem; ++i) {
@@ -81,11 +81,12 @@ TEST_F(PoolingTest, DISABLED_TestGetNdForwardOutputDim) {
   float* x_dev = nullptr;
   CUDNNXX_CUDA_CHECK(cudaMalloc(&x_dev, x_size));
   CUDNNXX_CUDA_CHECK(cudaMemcpy(x_dev, x_host, x_size, cudaMemcpyHostToDevice));
-  Tensor<float> x_tensor(CUDNN_DATA_FLOAT, n_dims, dims, strides, x_dev);
-  std::vector<int> out_dims = pool.GetNdForwardOutputDim(x_tensor, n_dims);
-  std::vector<int> out_dims_ref(n_dims);
+  int x_strides[n_x_dims] = {6144, 192, 64, 8, 1};
+  Tensor<float> x_tensor(CUDNN_DATA_FLOAT, n_x_dims, dims, x_strides, x_dev);
+  std::vector<int> out_dims = pool.GetNdForwardOutputDim(x_tensor, n_x_dims);
+  std::vector<int> out_dims_ref(n_x_dims);
   CUDNNXX_DNN_CHECK(cudnnGetPoolingNdForwardOutputDim(
-      pool.desc(), x_tensor.desc(), n_dims, out_dims_ref.data()));
+      pool.desc(), x_tensor.desc(), n_x_dims, out_dims_ref.data()));
   for (size_t i = 0; i < out_dims.size(); ++i) {
     EXPECT_EQ(out_dims_ref[i], out_dims[i]) << "Value does not match: " << i;
   }

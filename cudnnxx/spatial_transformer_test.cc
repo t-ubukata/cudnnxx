@@ -12,7 +12,8 @@ class SpatialTransformerTest : public ::testing::Test {
 TEST_F(SpatialTransformerTest, TestConstructor) {
   constexpr int n_dims = 4;
   int dims[n_dims] = {2, 2, 3, 2};
-  SpatialTransformer<float, float> st(CUDNN_DATA_FLOAT, n_dims, dims);
+  SpatialTransformer<float, float, float, float> st(CUDNN_DATA_FLOAT, n_dims,
+                                                    dims);
 }
 
 TEST_F(SpatialTransformerTest, TestGridGeneratorForward) {
@@ -24,7 +25,8 @@ TEST_F(SpatialTransformerTest, TestGridGeneratorForward) {
   // TODO: It looks like cudnnSpatialTfGridGeneratorForward requires NCHW
   // implicitly.
   int dims[n_dims] = {n, c, h, w};
-  SpatialTransformer<float, float> st(CUDNN_DATA_FLOAT, n_dims, dims);
+  SpatialTransformer<float, float, float, float> st(CUDNN_DATA_FLOAT, n_dims,
+                                                    dims);
 
   constexpr int theta_n_elem = n * 2 * 3;
   float theta_host[theta_n_elem] = {};
@@ -73,7 +75,8 @@ TEST_F(SpatialTransformerTest, TestGridGeneratorBackward) {
   constexpr int h = 3;
   constexpr int w = 2;
   int dims[n_dims] = {n, c, h, w};
-  SpatialTransformer<float, float> st(CUDNN_DATA_FLOAT, n_dims, dims);
+  SpatialTransformer<float, float, float, float> st(CUDNN_DATA_FLOAT, n_dims,
+                                                    dims);
 
   constexpr int theta_n_elem = n * 2 * 3;
   float theta_host[theta_n_elem] = {};
@@ -127,7 +130,8 @@ TEST_F(SpatialTransformerTest, TestSamplerForward) {
   constexpr int h = 3;
   constexpr int w = 2;
   int dims[n_dims] = {n, c, h, w};
-  SpatialTransformer<float, float> st(CUDNN_DATA_FLOAT, n_dims, dims);
+  SpatialTransformer<float, float, float, float> st(CUDNN_DATA_FLOAT, n_dims,
+                                                    dims);
 
   constexpr int theta_n_elem = n * 2 * 3;
   float theta_host[theta_n_elem] = {};
@@ -205,7 +209,8 @@ TEST_F(SpatialTransformerTest, TestSamplerBackward) {
   constexpr int h = 3;
   constexpr int w = 2;
   int dims[n_dims] = {n, c, h, w};
-  SpatialTransformer<float, float> st(CUDNN_DATA_FLOAT, n_dims, dims);
+  SpatialTransformer<float, float, float, float> st(CUDNN_DATA_FLOAT, n_dims,
+                                                    dims);
 
   constexpr int theta_n_elem = n * 2 * 3;
   float theta_host[theta_n_elem] = {};
@@ -255,7 +260,8 @@ TEST_F(SpatialTransformerTest, TestSamplerBackward) {
   float* dgrid_dev = nullptr;
   CUDNNXX_CUDA_CHECK(cudaMalloc(&dgrid_dev, grid_n_bytes));
 
-  st.SamplerBackward(handle, alpha, x, beta, &dx, alpha, y, grid_dev, beta, dgrid_dev);
+  st.SamplerBackward(handle, alpha, x, beta, &dx, alpha, y, grid_dev, beta,
+                     dgrid_dev);
 
   float dx_host[tensor_n_elem] = {};
   CUDNNXX_CUDA_CHECK(
@@ -267,7 +273,8 @@ TEST_F(SpatialTransformerTest, TestSamplerBackward) {
 
   float* dx_ref_dev = nullptr;
   CUDNNXX_CUDA_CHECK(cudaMalloc(&dx_ref_dev, tensor_n_bytes));
-  Tensor<float> dx_ref(CUDNN_DATA_FLOAT, CUDNN_TENSOR_NCHW, n, c, h, w, dx_ref_dev);
+  Tensor<float> dx_ref(CUDNN_DATA_FLOAT, CUDNN_TENSOR_NCHW, n, c, h, w,
+                       dx_ref_dev);
 
   float* dgrid_ref_dev = nullptr;
   CUDNNXX_CUDA_CHECK(cudaMalloc(&dgrid_ref_dev, grid_n_bytes));
@@ -278,12 +285,12 @@ TEST_F(SpatialTransformerTest, TestSamplerBackward) {
       &beta, dgrid_ref_dev));
 
   float dx_ref_host[tensor_n_elem] = {};
-  CUDNNXX_CUDA_CHECK(
-      cudaMemcpy(&dx_ref_host, dx_ref_dev, tensor_n_bytes, cudaMemcpyDeviceToHost));
+  CUDNNXX_CUDA_CHECK(cudaMemcpy(&dx_ref_host, dx_ref_dev, tensor_n_bytes,
+                                cudaMemcpyDeviceToHost));
 
   float dgrid_ref_host[grid_n_elem] = {};
-  CUDNNXX_CUDA_CHECK(
-      cudaMemcpy(&dgrid_ref_host, dgrid_ref_dev, grid_n_bytes, cudaMemcpyDeviceToHost));
+  CUDNNXX_CUDA_CHECK(cudaMemcpy(&dgrid_ref_host, dgrid_ref_dev, grid_n_bytes,
+                                cudaMemcpyDeviceToHost));
 
   for (int i = 0; i < tensor_n_elem; ++i) {
     EXPECT_NEAR(dx_ref_host[i], dx_host[i], 1e-4)

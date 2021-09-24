@@ -7,8 +7,7 @@
 
 namespace cudnnxx {
 
-// TODO: ThetaT, GridT
-template <typename TensorT, typename FactorT>
+template <typename TensorT, typename FactorT, typename ThetaT, typename GridT>
 class SpatialTransformer {
  public:
   SpatialTransformer(cudnnDataType_t dtype, int n_dims, int dims[]) {
@@ -26,19 +25,19 @@ class SpatialTransformer {
 
   cudnnSpatialTransformerDescriptor_t desc() const { return desc_; }
 
-  void GridGeneratorForward(const Handle& handle, void* theta, void* grid) {
+  void GridGeneratorForward(const Handle& handle, ThetaT* theta, GridT* grid) {
     CUDNNXX_DNN_CHECK(cudnnSpatialTfGridGeneratorForward(handle.raw_handle(),
                                                          desc_, theta, grid));
   }
 
-  void GridGeneratorBackward(const Handle& handle, const void* dgrid,
-                             void* dtheta) {
+  void GridGeneratorBackward(const Handle& handle, GridT* dgrid,
+                             ThetaT* dtheta) {
     CUDNNXX_DNN_CHECK(cudnnSpatialTfGridGeneratorBackward(
         handle.raw_handle(), desc_, dgrid, dtheta));
   }
 
   void SamplerForward(const Handle& handle, FactorT alpha,
-                      const Tensor<TensorT>& x, const void* grid, FactorT beta,
+                      const Tensor<TensorT>& x, GridT* grid, FactorT beta,
                       Tensor<TensorT>* y) const {
     CUDNNXX_DNN_CHECK(cudnnSpatialTfSamplerForward(
         handle.raw_handle(), desc_, &alpha, x.desc(), x.dev_mem(), grid, &beta,
@@ -48,8 +47,8 @@ class SpatialTransformer {
   void SamplerBackward(const Handle& handle, FactorT alpha,
                        const Tensor<TensorT>& x, FactorT beta,
                        Tensor<TensorT>* dx, FactorT alpha_d_grid,
-                       const Tensor<TensorT>& dy, const void* grid,
-                       FactorT beta_d_grid, void* dgrid) const {
+                       const Tensor<TensorT>& dy, GridT* grid,
+                       FactorT beta_d_grid, GridT* dgrid) const {
     CUDNNXX_DNN_CHECK(cudnnSpatialTfSamplerBackward(
         handle.raw_handle(), desc_, &alpha, x.desc(), x.dev_mem(), &beta,
         dx->desc(), dx->dev_mem(), &alpha_d_grid, dy.desc(), dy.dev_mem(), grid,

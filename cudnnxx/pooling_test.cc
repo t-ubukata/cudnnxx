@@ -63,8 +63,8 @@ TEST_F(PoolingTest, TestGetNdForwardOutputDim) {
   int paddings[n_pooling_dims] = {1, 1, 1};
   int pooling_strides[n_pooling_dims] = {2, 2, 2};
   Pooling<float, float> pool(CUDNN_POOLING_MAX_DETERMINISTIC,
-                             CUDNN_PROPAGATE_NAN, n_pooling_dims, window_dims, paddings,
-                             pooling_strides);
+                             CUDNN_PROPAGATE_NAN, n_pooling_dims, window_dims,
+                             paddings, pooling_strides);
   constexpr int x_n = 32;
   constexpr int x_c = 3;
   constexpr int x_h = 8;

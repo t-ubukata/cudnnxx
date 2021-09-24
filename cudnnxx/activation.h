@@ -7,7 +7,6 @@
 
 namespace cudnnxx {
 
-// FactorT must be float or double.
 template <typename TensorT, typename FactorT>
 class Activation {
  public:
@@ -34,7 +33,7 @@ class Activation {
   cudnnActivationDescriptor_t desc() const { return desc_; }
 
   void Forward(const Handle& handle, FactorT alpha, const Tensor<TensorT>& x,
-               FactorT beta, Tensor<TensorT>* y) {
+               FactorT beta, Tensor<TensorT>* y) const {
     CUDNNXX_DNN_CHECK(cudnnActivationForward(handle.raw_handle(), desc_, &alpha,
                                              x.desc(), x.dev_mem(), &beta,
                                              y->desc(), y->dev_mem()));
@@ -42,7 +41,7 @@ class Activation {
 
   void Backward(const Handle& handle, FactorT alpha, const Tensor<TensorT>& y,
                 const Tensor<TensorT>& dy, const Tensor<TensorT>& x,
-                FactorT beta, const Tensor<TensorT>* dx) {
+                FactorT beta, const Tensor<TensorT>* dx) const {
     CUDNNXX_DNN_CHECK(cudnnActivationBackward(
         handle.raw_handle(), desc_, &alpha, y.desc(), y.dev_mem(), dy.desc(),
         dy.dev_mem(), x.desc(), x.dev_mem(), &beta, dx->desc(), dx->dev_mem()));

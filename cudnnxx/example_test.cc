@@ -23,7 +23,8 @@ TEST_F(ExampleTest, TestConvolutionForward2d) {
   }
   float* x_dev = nullptr;
   CUDNNXX_CUDA_CHECK(cudaMalloc(&x_dev, x_n_bytes));
-  CUDNNXX_CUDA_CHECK(cudaMemcpy(x_dev, x_host, x_n_bytes, cudaMemcpyHostToDevice));
+  CUDNNXX_CUDA_CHECK(
+      cudaMemcpy(x_dev, x_host, x_n_bytes, cudaMemcpyHostToDevice));
   Tensor<float> x(CUDNN_DATA_FLOAT, CUDNN_TENSOR_NCHW, x_n, x_c, x_h, x_w,
                   x_dev);
 
@@ -39,7 +40,8 @@ TEST_F(ExampleTest, TestConvolutionForward2d) {
   }
   float* w_dev = nullptr;
   CUDNNXX_CUDA_CHECK(cudaMalloc(&w_dev, w_n_bytes));
-  CUDNNXX_CUDA_CHECK(cudaMemcpy(w_dev, w_host, w_n_bytes, cudaMemcpyHostToDevice));
+  CUDNNXX_CUDA_CHECK(
+      cudaMemcpy(w_dev, w_host, w_n_bytes, cudaMemcpyHostToDevice));
   Filter<float> w(CUDNN_DATA_FLOAT, CUDNN_TENSOR_NCHW, w_k, w_c, w_h, w_w,
                   w_dev);
 
@@ -63,7 +65,8 @@ TEST_F(ExampleTest, TestConvolutionForward2d) {
   constexpr float beta = 0;
   conv.Forward(handle, alpha, x, w, algo, ws, ws_n_bytes, beta, &y);
   float y_host[y_n_elem] = {};
-  CUDNNXX_CUDA_CHECK(cudaMemcpy(y_host, y_dev, y_n_bytes, cudaMemcpyDeviceToHost));
+  CUDNNXX_CUDA_CHECK(
+      cudaMemcpy(y_host, y_dev, y_n_bytes, cudaMemcpyDeviceToHost));
 
   float* y_dev_ref = nullptr;
   CUDNNXX_CUDA_CHECK(cudaMalloc(&y_dev_ref, y_n_bytes));
@@ -77,7 +80,7 @@ TEST_F(ExampleTest, TestConvolutionForward2d) {
       cudaMemcpy(y_host_ref, y_dev_ref, y_n_bytes, cudaMemcpyDeviceToHost));
 
   for (int i = 0; i < y_n_elem; ++i) {
-    EXPECT_EQ(y_host_ref[i], y_host[i]) << "Value does not match: " << i;
+    EXPECT_EQ(y_host_ref[i], y_host[i]) << "at index " << i;
   }
 
   CUDNNXX_CUDA_CHECK(cudaFree(y_dev_ref));
@@ -100,7 +103,8 @@ TEST_F(ExampleTest, TestcudnnConvolutionForward2d) {
   }
   float* x_dev = nullptr;
   CUDNNXX_CUDA_CHECK(cudaMalloc(&x_dev, x_n_bytes));
-  CUDNNXX_CUDA_CHECK(cudaMemcpy(x_dev, x_host, x_n_bytes, cudaMemcpyHostToDevice));
+  CUDNNXX_CUDA_CHECK(
+      cudaMemcpy(x_dev, x_host, x_n_bytes, cudaMemcpyHostToDevice));
   cudnnTensorDescriptor_t x_desc;
   CUDNNXX_DNN_CHECK(cudnnCreateTensorDescriptor(&x_desc));
   CUDNNXX_DNN_CHECK(cudnnSetTensor4dDescriptor(
@@ -118,7 +122,8 @@ TEST_F(ExampleTest, TestcudnnConvolutionForward2d) {
   }
   float* w_dev = nullptr;
   CUDNNXX_CUDA_CHECK(cudaMalloc(&w_dev, w_n_bytes));
-  CUDNNXX_CUDA_CHECK(cudaMemcpy(w_dev, w_host, w_n_elem, cudaMemcpyHostToDevice));
+  CUDNNXX_CUDA_CHECK(
+      cudaMemcpy(w_dev, w_host, w_n_elem, cudaMemcpyHostToDevice));
   Filter<float> w(CUDNN_DATA_FLOAT, CUDNN_TENSOR_NCHW, w_k, w_c, w_h, w_w,
                   w_dev);
 
@@ -161,7 +166,8 @@ TEST_F(ExampleTest, TestcudnnConvolutionForward2d) {
                                             ws_n_bytes, &beta, y_desc, y_dev));
 
   float y_host[y_n_elem] = {};
-  CUDNNXX_CUDA_CHECK(cudaMemcpy(y_host, y_dev, y_n_bytes, cudaMemcpyDeviceToHost));
+  CUDNNXX_CUDA_CHECK(
+      cudaMemcpy(y_host, y_dev, y_n_bytes, cudaMemcpyDeviceToHost));
 
   CUDNNXX_DNN_CHECK(cudnnDestroy(raw_handle));
   CUDNNXX_DNN_CHECK(cudnnDestroyConvolutionDescriptor(conv_desc));

@@ -46,13 +46,13 @@ class SpatialTransformer {
 
   void SamplerBackward(const Handle& handle, FactorT alpha,
                        const Tensor<TensorT>& x, FactorT beta,
-                       Tensor<TensorT>* dx, FactorT alpha_d_grid,
+                       Tensor<TensorT>* dx, FactorT alpha_dgrid,
                        const Tensor<TensorT>& dy, GridT* grid,
-                       FactorT beta_d_grid, GridT* dgrid) const {
+                       FactorT beta_dgrid, GridT* dgrid) const {
     CUDNNXX_DNN_CHECK(cudnnSpatialTfSamplerBackward(
         handle.raw_handle(), desc_, &alpha, x.desc(), x.dev_mem(), &beta,
-        dx->desc(), dx->dev_mem(), &alpha_d_grid, dy.desc(), dy.dev_mem(), grid,
-        &beta_d_grid, dgrid));
+        dx->desc(), dx->dev_mem(), &alpha_dgrid, dy.desc(), dy.dev_mem(), grid,
+        &beta_dgrid, dgrid));
   }
 
  private:

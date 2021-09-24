@@ -7,7 +7,6 @@
 
 namespace cudnnxx {
 
-// FactorT must be float or double.
 template <typename TensorT, typename FactorT>
 class Convolution {
  public:
@@ -79,10 +78,11 @@ class Convolution {
                                  const Filter<TensorT>& w,
                                  const Tensor<TensorT>& y,
                                  cudnnConvolutionFwdAlgo_t algo) const {
-    size_t size = 0;
+    size_t n_bytes = 0;
     CUDNNXX_DNN_CHECK(cudnnGetConvolutionForwardWorkspaceSize(
-        handle.raw_handle(), x.desc(), w.desc(), desc_, y.desc(), algo, &size));
-    return size;
+        handle.raw_handle(), x.desc(), w.desc(), desc_, y.desc(), algo,
+        &n_bytes));
+    return n_bytes;
   }
 
   void FindForwardAlgorithm(const Handle& handle, const Tensor<TensorT>& x,
@@ -90,12 +90,11 @@ class Convolution {
                             const int requested_algo_count,
                             int* returned_algo_count,
                             cudnnConvolutionFwdAlgoPerf_t* results,
-                            void* workspace,
-                            size_t workspace_size_in_bytes) const {
+                            void* workspace, size_t workspace_n_bytes) const {
     CUDNNXX_DNN_CHECK(cudnnFindConvolutionForwardAlgorithmEx(
         handle.raw_handle(), x.desc(), x.dev_mem(), w.desc(), w.dev_mem(),
         desc_, y.desc(), y.dev_mem(), requested_algo_count, returned_algo_count,
-        results, workspace, workspace_size_in_bytes));
+        results, workspace, workspace_n_bytes));
   }
 
   void Get2dForwardOutputDim(const Tensor<TensorT>& input,
@@ -114,12 +113,12 @@ class Convolution {
 
   void Forward(const Handle& handle, FactorT alpha, const Tensor<TensorT>& x,
                const Filter<TensorT>& w, cudnnConvolutionFwdAlgo_t algo,
-               void* workspace, size_t workspace_size, FactorT beta,
+               void* workspace, size_t workspace_n_bytes, FactorT beta,
                Tensor<TensorT>* y) const {
     CUDNNXX_DNN_CHECK(cudnnConvolutionForward(
         handle.raw_handle(), &alpha, x.desc(), x.dev_mem(), w.desc(),
-        w.dev_mem(), desc_, algo, workspace, workspace_size, &beta, y->desc(),
-        y->dev_mem()));
+        w.dev_mem(), desc_, algo, workspace, workspace_n_bytes, &beta,
+        y->desc(), y->dev_mem()));
   }
 
   // TODO: cudnnConvolutionBiasActivationForward
@@ -144,33 +143,33 @@ class Convolution {
   size_t GetBackwardDataWorkspaceSize(
       const Handle& handle, const Filter<TensorT>& w, const Tensor<TensorT>& dy,
       const Tensor<TensorT>& dx, cudnnConvolutionBwdDataAlgo_t algo) const {
-    size_t size = 0;
+    size_t n_bytes = 0;
     CUDNNXX_DNN_CHECK(cudnnGetConvolutionBackwardDataWorkspaceSize(
         handle.raw_handle(), w.desc(), dy.desc(), desc_, dx.desc(), algo,
-        &size));
-    return size;
+        &n_bytes));
+    return n_bytes;
   }
 
   void FindBackwardDataAlgorithm(
       const Handle& handle, const Filter<TensorT>& w, const Tensor<TensorT>& dy,
       const Tensor<TensorT>& dx, const int requested_algo_count,
       int* returned_algo_count, cudnnConvolutionBwdDataAlgoPerf_t* results,
-      void* workspace, size_t workspace_size_in_bytes) const {
+      void* workspace, size_t workspace_n_bytes) const {
     CUDNNXX_DNN_CHECK(cudnnFindConvolutionBackwardDataAlgorithmEx(
         handle.raw_handle(), w.desc(), w.dev_mem(), dy.desc(), dy.dev_mem(),
         desc_, dx.desc(), dx.dev_mem(), requested_algo_count,
-        returned_algo_count, results, workspace, workspace_size_in_bytes));
+        returned_algo_count, results, workspace, workspace_n_bytes));
   }
 
   void BackwardData(const Handle& handle, FactorT alpha,
                     const Filter<TensorT>& w, const Tensor<TensorT>& dy,
                     cudnnConvolutionBwdDataAlgo_t algo, void* workspace,
-                    size_t workspace_size, FactorT beta,
+                    size_t workspace_n_bytes, FactorT beta,
                     Tensor<TensorT>* dx) const {
     CUDNNXX_DNN_CHECK(cudnnConvolutionBackwardData(
         handle.raw_handle(), &alpha, w.desc(), w.dev_mem(), dy.desc(),
-        dy.dev_mem(), desc_, algo, workspace, workspace_size, &beta, dx->desc(),
-        dx->dev_mem()));
+        dy.dev_mem(), desc_, algo, workspace, workspace_n_bytes, &beta,
+        dx->desc(), dx->dev_mem()));
   }
 
   static int GetBackwardFilterAlgorithmMaxCount(const Handle& handle) {
@@ -193,33 +192,33 @@ class Convolution {
   size_t GetBackwardFilterWorkspaceSize(
       const Handle& handle, const Tensor<TensorT>& x, const Tensor<TensorT>& dy,
       const Filter<TensorT>& dw, cudnnConvolutionBwdFilterAlgo_t algo) const {
-    size_t size = 0;
+    size_t n_bytes = 0;
     CUDNNXX_DNN_CHECK(cudnnGetConvolutionBackwardFilterWorkspaceSize(
         handle.raw_handle(), x.desc(), dy.desc(), desc_, dw.desc(), algo,
-        &size));
-    return size;
+        &n_bytes));
+    return n_bytes;
   }
 
   void FindBackwardFilterAlgorithm(
       const Handle& handle, const Tensor<TensorT>& x, const Tensor<TensorT>& dy,
       const Filter<TensorT>& dw, const int requested_algo_count,
       int* returned_algo_count, cudnnConvolutionBwdFilterAlgoPerf_t* results,
-      void* workspace, size_t workspace_size_in_bytes) const {
+      void* workspace, size_t workspace_n_bytes) const {
     CUDNNXX_DNN_CHECK(cudnnFindConvolutionBackwardFilterAlgorithmEx(
         handle.raw_handle(), x.desc(), x.dev_mem(), dy.desc(), dy.dev_mem(),
         desc_, dw.desc(), dw.dev_mem(), requested_algo_count,
-        returned_algo_count, results, workspace, workspace_size_in_bytes));
+        returned_algo_count, results, workspace, workspace_n_bytes));
   }
 
   void BackwardFilter(const Handle& handle, FactorT alpha,
                       const Tensor<TensorT>& x, const Tensor<TensorT>& dy,
                       cudnnConvolutionBwdFilterAlgo_t algo, void* workspace,
-                      size_t workspace_size, FactorT beta,
+                      size_t workspace_n_bytes, FactorT beta,
                       Filter<TensorT>* dw) const {
     CUDNNXX_DNN_CHECK(cudnnConvolutionBackwardFilter(
         handle.raw_handle(), &alpha, x.desc(), x.dev_mem(), dy.desc(),
-        dy.dev_mem(), desc_, algo, workspace, workspace_size, &beta, dw->desc(),
-        dw->dev_mem()));
+        dy.dev_mem(), desc_, algo, workspace, workspace_n_bytes, &beta,
+        dw->desc(), dw->dev_mem()));
   }
 
   // cudnnConvolutionBackwardBias

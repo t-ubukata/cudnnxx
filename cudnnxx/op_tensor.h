@@ -7,7 +7,6 @@
 
 namespace cudnnxx {
 
-// FactorT must be float or double.
 template <typename TensorT, typename FactorT>
 class OpTensor {
  public:

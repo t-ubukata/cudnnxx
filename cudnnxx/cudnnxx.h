@@ -11,11 +11,7 @@
 #include "cudnnxx/pooling.h"
 #include "cudnnxx/reduce_tensor.h"
 #include "cudnnxx/rnn.h"
+#include "cudnnxx/spatial_transformer.h"
 #include "cudnnxx/util.h"
-
-// TODO:
-// Op
-//   Algorithm (Deprecated in 8)
-//   AlgorithmPerformance (Deprecated in 8)
 
 #endif  // CUDNNXX_CUDNNXX_H_

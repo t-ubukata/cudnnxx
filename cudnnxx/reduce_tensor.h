@@ -7,7 +7,6 @@
 
 namespace cudnnxx {
 
-// FactorT must be float or double.
 template <typename TensorT, typename FactorT>
 class ReduceTensor {
  public:
@@ -30,13 +29,13 @@ class ReduceTensor {
   cudnnReduceTensorDescriptor_t desc() const { return desc_; }
 
   void Compute(const Handle& handle, void* indices,
-               size_t indices_size_in_bytes, void* workspace,
-               size_t workspace_size_in_bytes, FactorT alpha,
+               size_t indices_n_bytes, void* workspace,
+               size_t workspace_n_bytes, FactorT alpha,
                const Tensor<TensorT>& a, FactorT beta,
                Tensor<TensorT>* c) const {
     CUDNNXX_DNN_CHECK(cudnnReduceTensor(
-        handle.raw_handle(), desc_, indices, indices_size_in_bytes, workspace,
-        workspace_size_in_bytes, &alpha, a.desc(), a.dev_mem(), &beta,
+        handle.raw_handle(), desc_, indices, indices_n_bytes, workspace,
+        workspace_n_bytes, &alpha, a.desc(), a.dev_mem(), &beta,
         c->desc(), c->dev_mem()));
   }
 

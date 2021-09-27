@@ -18,25 +18,24 @@ TEST_F(CTCLossTest, TestConstructor2) {
                       CUDNN_NOT_PROPAGATE_NAN);
 }
 
-// TODO: Value check.
+// No value check.
 TEST_F(CTCLossTest, TestGetWorkspaceSize) {
   CTCLoss<float> ctcl(CUDNN_DATA_FLOAT, CUDNN_LOSS_NORMALIZATION_NONE,
                       CUDNN_NOT_PROPAGATE_NAN);
-  constexpr int t = 50;  // input length
-  constexpr int c = 20;  // number of classes
-  constexpr int n = 16;  // batch size
-  // constexpr int s = 30;  // max target length
+  constexpr int t = 50;  // Input length.
+  constexpr int c = 20;  // The number of classes.
+  constexpr int n = 16;  // Batch size.
 
   constexpr int probs_n_elem = t * n * c;
-  size_t probs_size_in_bytes = sizeof(float) * probs_n_elem;
+  size_t probs_n_bytes = sizeof(float) * probs_n_elem;
 
   float probs_mem_host[probs_n_elem] = {0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8,
                                         0.9, 1.0, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6,
                                         1.7, 1.8, 1.9, 2.0, 2.1, 2.2, 2.3, 2.4};
   float* probs_mem_dev = nullptr;
-  CUDNNXX_CUDA_CHECK(cudaMalloc(&probs_mem_dev, probs_size_in_bytes));
+  CUDNNXX_CUDA_CHECK(cudaMalloc(&probs_mem_dev, probs_n_bytes));
   CUDNNXX_CUDA_CHECK(cudaMemcpy(probs_mem_dev, probs_mem_host,
-                                probs_size_in_bytes, cudaMemcpyHostToDevice));
+                                probs_n_bytes, cudaMemcpyHostToDevice));
   constexpr int probs_n_dims = 3;
   int probs_dims[probs_n_dims] = {t, n, c};
   int probs_strides[probs_n_dims] = {probs_dims[1] * probs_dims[2],
@@ -45,14 +44,13 @@ TEST_F(CTCLossTest, TestGetWorkspaceSize) {
                       probs_mem_dev);
 
   constexpr int gradients_n_elem = probs_n_elem;
-  size_t gradients_size_in_bytes = sizeof(float) * gradients_n_elem;
+  size_t gradients_n_bytes = sizeof(float) * gradients_n_elem;
 
   float gradients_mem_host[gradients_n_elem] = {0};
   float* gradients_mem_dev = nullptr;
-  CUDNNXX_CUDA_CHECK(cudaMalloc(&gradients_mem_dev, gradients_size_in_bytes));
+  CUDNNXX_CUDA_CHECK(cudaMalloc(&gradients_mem_dev, gradients_n_bytes));
   CUDNNXX_CUDA_CHECK(cudaMemcpy(gradients_mem_dev, gradients_mem_host,
-                                gradients_size_in_bytes,
-                                cudaMemcpyHostToDevice));
+                                gradients_n_bytes, cudaMemcpyHostToDevice));
   constexpr int gradients_n_dims = 3;
   int gradients_dims[gradients_n_dims] = {t, n, c};
   int gradients_strides[gradients_n_dims] = {
@@ -84,21 +82,20 @@ TEST_F(CTCLossTest, TestGetWorkspaceSize) {
 TEST_F(CTCLossTest, TestCompute) {
   CTCLoss<float> ctcl(CUDNN_DATA_FLOAT, CUDNN_LOSS_NORMALIZATION_NONE,
                       CUDNN_NOT_PROPAGATE_NAN);
-  constexpr int t = 50;  // input length
-  constexpr int c = 20;  // number of classes
-  constexpr int n = 16;  // batch size
-  // constexpr int s = 30;  // max target length
+  constexpr int t = 50;  // Input length.
+  constexpr int c = 20;  // The number of classes.
+  constexpr int n = 16;  // Batch size.
 
   constexpr int probs_n_elem = t * n * c;
-  size_t probs_size_in_bytes = sizeof(float) * probs_n_elem;
+  size_t probs_n_bytes = sizeof(float) * probs_n_elem;
 
   float probs_mem_host[probs_n_elem] = {0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8,
                                         0.9, 1.0, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6,
                                         1.7, 1.8, 1.9, 2.0, 2.1, 2.2, 2.3, 2.4};
   float* probs_mem_dev = nullptr;
-  CUDNNXX_CUDA_CHECK(cudaMalloc(&probs_mem_dev, probs_size_in_bytes));
+  CUDNNXX_CUDA_CHECK(cudaMalloc(&probs_mem_dev, probs_n_bytes));
   CUDNNXX_CUDA_CHECK(cudaMemcpy(probs_mem_dev, probs_mem_host,
-                                probs_size_in_bytes, cudaMemcpyHostToDevice));
+                                probs_n_bytes, cudaMemcpyHostToDevice));
   constexpr int probs_n_dims = 3;
   int probs_dims[probs_n_dims] = {t, n, c};
   int probs_strides[probs_n_dims] = {probs_dims[1] * probs_dims[2],
@@ -107,14 +104,13 @@ TEST_F(CTCLossTest, TestCompute) {
                       probs_mem_dev);
 
   constexpr int gradients_n_elem = probs_n_elem;
-  size_t gradients_size_in_bytes = sizeof(float) * gradients_n_elem;
+  size_t gradients_n_bytes = sizeof(float) * gradients_n_elem;
 
   float gradients_mem_host[gradients_n_elem] = {0};
   float* gradients_mem_dev = nullptr;
-  CUDNNXX_CUDA_CHECK(cudaMalloc(&gradients_mem_dev, gradients_size_in_bytes));
+  CUDNNXX_CUDA_CHECK(cudaMalloc(&gradients_mem_dev, gradients_n_bytes));
   CUDNNXX_CUDA_CHECK(cudaMemcpy(gradients_mem_dev, gradients_mem_host,
-                                gradients_size_in_bytes,
-                                cudaMemcpyHostToDevice));
+                                gradients_n_bytes, cudaMemcpyHostToDevice));
   constexpr int gradients_n_dims = 3;
   int gradients_dims[gradients_n_dims] = {t, n, c};
   int gradients_strides[gradients_n_dims] = {
@@ -138,19 +134,17 @@ TEST_F(CTCLossTest, TestCompute) {
 
   int input_lengths[n] = {t};
   auto algo = CUDNN_CTC_LOSS_ALGO_DETERMINISTIC;
-  auto workspace_size_in_bytes =
-      ctcl.GetWorkspaceSize(handle, probs, gradients, labels.data(),
-                            labels_lengths, input_lengths, algo);
+  auto ws_n_bytes = ctcl.GetWorkspaceSize(handle, probs, gradients, labels.data(), labels_lengths, input_lengths, algo);
 
-  void* workspace;
-  CUDNNXX_CUDA_CHECK(cudaMalloc(&workspace, workspace_size_in_bytes));
+  void* ws = nullptr;
+  CUDNNXX_CUDA_CHECK(cudaMalloc(&ws, ws_n_bytes));
   void* costs = nullptr;
   CUDNNXX_CUDA_CHECK(cudaMalloc(&costs, n));
   ctcl.Compute(handle, probs, labels.data(), labels_lengths, input_lengths,
-               costs, &gradients, algo, workspace, workspace_size_in_bytes);
+               costs, &gradients, algo, ws, ws_n_bytes);
 
   CUDNNXX_CUDA_CHECK(cudaFree(costs));
-  CUDNNXX_CUDA_CHECK(cudaFree(workspace));
+  CUDNNXX_CUDA_CHECK(cudaFree(ws));
   CUDNNXX_CUDA_CHECK(cudaFree(probs_mem_dev));
 }
 

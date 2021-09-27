@@ -10,7 +10,6 @@
 
 namespace cudnnxx {
 
-// FactorT must be float or double.
 template <typename TensorT, typename FactorT>
 class Pooling {
  public:
@@ -40,7 +39,7 @@ class Pooling {
 
   cudnnPoolingDescriptor_t desc() const { return desc_; }
 
-  std::array<int, 4> Get2dForwardOutputDim(const Tensor<TensorT>& in) {
+  std::array<int, 4> Get2dForwardOutputDim(const Tensor<TensorT>& in) const {
     int n = 0;
     int c = 0;
     int h = 0;
@@ -51,7 +50,7 @@ class Pooling {
   }
 
   std::vector<int> GetNdForwardOutputDim(const Tensor<TensorT>& in,
-                                         int n_dims) {
+                                         int n_dims) const {
     std::vector<int> out_dims(n_dims);
     CUDNNXX_DNN_CHECK(cudnnGetPoolingNdForwardOutputDim(
         desc_, in.desc(), n_dims, out_dims.data()));
@@ -59,7 +58,7 @@ class Pooling {
   }
 
   void Forward(const Handle& handle, FactorT alpha, const Tensor<TensorT>& x,
-               FactorT beta, Tensor<TensorT>* y) {
+               FactorT beta, Tensor<TensorT>* y) const {
     CUDNNXX_DNN_CHECK(cudnnPoolingForward(handle.raw_handle(), desc_, &alpha,
                                           x.desc(), x.dev_mem(), &beta,
                                           y->desc(), y->dev_mem()));
@@ -67,7 +66,7 @@ class Pooling {
 
   void Backward(const Handle& handle, FactorT alpha, const Tensor<TensorT>& y,
                 const Tensor<TensorT>& dy, const Tensor<TensorT>& x,
-                FactorT beta, Tensor<TensorT>* dx) {
+                FactorT beta, Tensor<TensorT>* dx) const {
     CUDNNXX_DNN_CHECK(cudnnPoolingBackward(
         handle.raw_handle(), desc_, &alpha, y.desc(), y.dev_mem(), dy.desc(),
         dy.dev_mem(), x.desc(), x.dev_mem(), &beta, dx->desc(), dx->dev_mem()));

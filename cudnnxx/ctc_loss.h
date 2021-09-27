@@ -9,7 +9,6 @@
 
 namespace cudnnxx {
 
-// TODO: Consider to implement as one function.
 template <typename TensorT>
 class CTCLoss {
  public:
@@ -35,20 +34,20 @@ class CTCLoss {
   size_t GetWorkspaceSize(const Handle& handle, const Tensor<TensorT>& probs,
                           const Tensor<TensorT>& gradients, int* labels,
                           int* label_lengths, int* input_lengths,
-                          cudnnCTCLossAlgo_t algo) {
-    size_t size_in_bytes = 0;
+                          cudnnCTCLossAlgo_t algo) const {
+    size_t n_bytes = 0;
     // Note: labels is host memory and ideally an tensor.
     CUDNNXX_DNN_CHECK(cudnnGetCTCLossWorkspaceSize(
         handle.raw_handle(), probs.desc(), gradients.desc(), labels,
-        label_lengths, input_lengths, algo, desc_, &size_in_bytes));
-    return size_in_bytes;
+        label_lengths, input_lengths, algo, desc_, &n_bytes));
+    return n_bytes;
   }
 
   void Compute(const Handle& handle, const Tensor<TensorT>& probs, int* labels,
                int* label_lengths, int* input_lengths, void* costs,
                Tensor<TensorT>* gradients, cudnnCTCLossAlgo_t algo,
-               void* workspace, size_t workspace_size_in_bytes) {
-    // cuDNN documentation says workSpaceSizeInBytes is type of size_t*,
+               void* workspace, size_t workspace_size_in_bytes) const {
+    // Note: cuDNN documentation says workSpaceSizeInBytes is type of size_t*,
     // but actually size_t.
     CUDNNXX_DNN_CHECK(cudnnCTCLoss(
         handle.raw_handle(), probs.desc(), probs.dev_mem(), labels,

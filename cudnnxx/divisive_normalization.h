@@ -7,7 +7,6 @@
 
 namespace cudnnxx {
 
-// FactorT must be float or double.
 template <typename TensorT, typename FactorT>
 class DivisiveNormalization {
  public:
@@ -36,7 +35,7 @@ class DivisiveNormalization {
 
   void Forward(const Handle& handle, FactorT alpha, const Tensor<TensorT>& x,
                const Tensor<TensorT>& means, const Tensor<TensorT>& temp,
-               const Tensor<TensorT>& temp2, FactorT beta, Tensor<TensorT>* y) {
+               const Tensor<TensorT>& temp2, FactorT beta, Tensor<TensorT>* y) const {
     CUDNNXX_DNN_CHECK(cudnnDivisiveNormalizationForward(
         handle.raw_handle(), desc_, mode_, &alpha, x.desc(), x.dev_mem(),
         means.dev_mem(), temp.dev_mem(), temp2.dev_mem(), &beta, y->desc(),
@@ -46,7 +45,7 @@ class DivisiveNormalization {
   void Backward(const Handle& handle, FactorT alpha, const Tensor<TensorT>& x,
                 const Tensor<TensorT>& means, const Tensor<TensorT>& dy,
                 const Tensor<TensorT>& temp, const Tensor<TensorT>& temp2,
-                FactorT beta, Tensor<TensorT>* dx, Tensor<TensorT>* d_means) {
+                FactorT beta, Tensor<TensorT>* dx, Tensor<TensorT>* d_means) const {
     CUDNNXX_DNN_CHECK(cudnnDivisiveNormalizationBackward(
         handle.raw_handle(), desc_, mode_, &alpha, x.desc(), x.dev_mem(),
         means.dev_mem(), dy.dev_mem(), temp.dev_mem(), temp2.dev_mem(), &beta,

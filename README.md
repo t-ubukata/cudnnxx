@@ -25,3 +25,8 @@ make
 
 Include cudnnxx/cudnnxx.h.  
 See cudnnxx/example_test.cc for more information.
+
+## License
+
+MIT
+
